@@ -1,11 +1,11 @@
 use app_arguments::{ApplicationArguments, Command};
 use quicli::prelude::*;
 mod app_arguments;
-use mysql_struct::mysql_struct;
-use sql_template::gen_struct::GenStruct;
+use sql_reveser_struct::mysql_struct;
+use sql_reveser_template::gen_struct::GenStruct;
 use structopt::StructOpt;
-use sql_template::table::Table;
-use sql_template::render::Render;
+use sql_reveser_template::table::Table;
+use sql_reveser_template::render::Render;
 
 #[tokio::main]
 async fn main() -> CliResult {

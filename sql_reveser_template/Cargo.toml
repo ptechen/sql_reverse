@@ -1,5 +1,5 @@
 [package]
-name = "sql_template"
+name = "sql_reveser_template"
 version = "0.1.0"
 edition = "2021"
 homepage = "https://github.com/ptechen"
@@ -7,7 +7,7 @@ documentation = "https://github.com/ptechen/sql_reveser/blob/main/README.md"
 repository = "https://github.com/ptechen/sql_reveser.git"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-description = "sql reveser error"
+description = "sql reveser template"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

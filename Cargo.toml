@@ -1,2 +1,2 @@
 [workspace]
-members = ["sql_reveser", "mysql_struct", "sql_template", "sql_reveser_error"]
+members = ["sql_reveser", "sql_reveser_struct", "sql_reveser_template", "sql_reveser_error"]

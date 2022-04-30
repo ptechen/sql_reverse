@@ -2,10 +2,10 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/mysql_struct/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/sql_template/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/sql_reveser/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/sql_reveser_error/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/sql_reveser_struct/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/sql_reveser_template/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
