@@ -6,10 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sql_reveser_struct = { version = "0.1.0"}
-sql_reveser_error = { version = "0.1.0"}
+sql_reveser_struct = { version = "^0.1"}
+sql_reveser_error = { version = "^0.1"}
 quicli = "0.4.0"
-sql_reveser_template = { path = "../sql_reveser_template", features = ["tokio"], default_features = false}
+sql_reveser_template = { version = "^0.1", features = ["tokio"], default_features = false}
 structopt = "0.3.26"
 tokio = { version = "1.18.0", features = ["full"]}
 
