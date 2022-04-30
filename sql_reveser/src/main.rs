@@ -1,14 +1,14 @@
 use app_arguments::{ApplicationArguments, Command};
-use quicli::prelude::*;
 mod app_arguments;
 use sql_reveser_struct::mysql_struct;
 use sql_reveser_template::gen_struct::GenStruct;
 use sql_reveser_template::render::Render;
 use sql_reveser_template::table::Table;
+use sql_reveser_error::result::Result;
 use structopt::StructOpt;
 
 #[tokio::main]
-async fn main() -> CliResult {
+async fn main() -> Result<()> {
     let args = ApplicationArguments::from_args();
     let key = args.command;
     match key {

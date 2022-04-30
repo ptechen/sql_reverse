@@ -27,6 +27,7 @@ pub trait Render {
         output_dir: &str,
         tables: &Vec<Table>,
     ) -> Result<()> {
+        create_dir(output_dir)?;
         let tera = Tera::new(template_path)?;
         let mut context = Context::new();
         let mod_path = format!("{}/mod.rs", output_dir);
