@@ -4,13 +4,13 @@ use async_std::{
     prelude::*,
 };
 
-const FLAG: &'static str = "// ***************************************以下是自定义代码区域******************************************";
-
 #[cfg(feature = "tokio")]
 use tokio::fs::{ OpenOptions};
 
 #[cfg(feature = "tokio")]
 use tokio::io::AsyncWriteExt;
+
+const FLAG: &'static str = "// ***************************************以下是自定义代码区域******************************************";
 
 use sql_reveser_error::result::Result;
 use tera::{Context, Tera};
