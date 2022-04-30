@@ -1,6 +1,6 @@
 [package]
 name = "sql_reveser_template"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 homepage = "https://github.com/ptechen"
 documentation = "https://github.com/ptechen/sql_reveser/blob/main/README.md"
