@@ -1,5 +1,5 @@
-use serde::Serialize;
 use crate::render::Render;
+use serde::Serialize;
 
 /// sql 表
 #[derive(Serialize, Clone, Default, Debug)]
@@ -52,4 +52,4 @@ impl Table {
     }
 }
 
-impl Render for Table{}
+impl Render for Table {}

@@ -1,6 +1,6 @@
 pub mod gen_struct;
-pub mod table;
 pub mod render;
+pub mod table;
 
 #[cfg(test)]
 mod tests {

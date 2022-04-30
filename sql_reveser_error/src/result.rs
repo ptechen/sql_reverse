@@ -1,11 +1,10 @@
 use mysql;
-use tera;
 use quicli;
 use serde_yaml;
+use tera;
 
 #[allow(dead_code)]
 pub type Result<T> = std::result::Result<T, Error>;
-
 
 #[derive(Debug)]
 pub enum Error {
@@ -15,7 +14,7 @@ pub enum Error {
     TeraError(tera::Error),
     MysqlUrlError(mysql::UrlError),
     MysqlError(mysql::error::Error),
-    CustomError(String)
+    CustomError(String),
 }
 
 #[derive(Debug, Clone, Default)]
@@ -51,7 +50,7 @@ impl std::error::Error for Error {
             Error::QuiCliError(ref error) => {
                 let s: CustomError = From::from(error.to_string());
                 Some(s.into())
-            },
+            }
             Error::TeraError(ref error) => Some(error),
             Error::MysqlUrlError(ref error) => Some(error),
             Error::MysqlError(ref error) => Some(error),

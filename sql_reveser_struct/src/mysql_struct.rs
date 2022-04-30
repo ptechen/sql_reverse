@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use inflector::Inflector;
 use mysql::prelude::*;
 use mysql::Row;
 use mysql::*;
@@ -6,11 +7,10 @@ use once_cell::sync::Lazy;
 use quicli::prelude::*;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use sql_reveser_template::table::{Field, Table};
-use sql_reveser_template::gen_struct::GenStruct;
-use std::collections::HashMap;
 use sql_reveser_error::result::Result;
-use inflector::Inflector;
+use sql_reveser_template::gen_struct::GenStruct;
+use sql_reveser_template::table::{Field, Table};
+use std::collections::HashMap;
 
 static FIELD_TYPE: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     let mut map = HashMap::new();
@@ -77,9 +77,7 @@ pub struct GenTemplateData {
 
 impl MysqlStruct {
     pub fn new(config: CustomConfig) -> Result<MysqlStruct> {
-        Ok(MysqlStruct {
-            config,
-        })
+        Ok(MysqlStruct { config })
     }
 
     pub fn load(filename: &str) -> Result<MysqlStruct> {
