@@ -1,0 +1,24 @@
+use serde_derive;
+use chrono::prelude::*;
+
+{% if template.comment -%}
+	/// {{ template.comment }}
+{% endif -%}
+#[crud_table]
+#[derive(Default, Debug, Clone, PartialEq, serde_derive::Serialize, serde_derive::Deserialize)]
+pub struct {{ template.struct_name }} {
+{%- for v in template.fields %}
+	{% if v.comment -%}
+	    /// {{ v.comment }}
+	{% endif -%}
+	pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+{%- endfor %}
+}
+
+impl {{ template.struct_name }} {
+    {%- for v in template.fields %}
+    pub fn get_{{ v.field_name }}(&self) -> Option<{{ v.field_type }}> {
+    	self.{{ v.field_name }}
+    }
+    {%- endfor %}
+}

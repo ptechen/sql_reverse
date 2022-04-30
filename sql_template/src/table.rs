@@ -1,0 +1,55 @@
+use serde::Serialize;
+use crate::render::Render;
+
+/// sql 表
+#[derive(Serialize, Clone, Default, Debug)]
+pub struct Table {
+    /// 表名
+    pub table_name: String,
+    /// 结构体名
+    pub struct_name: String,
+    /// 字段列表
+    pub fields: Vec<Field>,
+    /// 表注释
+    pub comment: String,
+    /// 主键
+    pub primary_key: Vec<String>,
+    /// 索引
+    pub index: Vec<String>,
+    /// 唯一索引
+    pub unique: Vec<String>,
+}
+
+/// sql 字段
+#[derive(Serialize, Clone, Default, Debug)]
+pub struct Field {
+    /// 字段名
+    pub field_name: String,
+    /// 字段类型
+    pub field_type: String,
+    /// 注释
+    pub comment: String,
+    /// 默认值是否为null, 1: is_null 0: not_null
+    pub is_null: u8,
+}
+
+impl Table {
+    pub fn new(
+        table_name: String,
+        struct_name: String,
+        fields: Vec<Field>,
+        comment: String,
+    ) -> Table {
+        Table {
+            table_name,
+            struct_name,
+            fields,
+            comment,
+            primary_key: vec![],
+            index: vec![],
+            unique: vec![],
+        }
+    }
+}
+
+impl Render for Table{}

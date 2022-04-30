@@ -1,0 +1,10 @@
+host: 127.0.0.1
+port: 3306
+database: kb
+username: root
+password: ''
+include_tables: # Include tables, can be ignored.
+#  - table_name
+exclude_tables: # Exclude, tables, can be ignored.
+#  - table_name
+output_dir: ./dir # code output directory
