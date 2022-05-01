@@ -1,17 +1,17 @@
 [package]
-name = "sql_reveser_template"
-version = "0.1.3"
+name = "sql_reverse_template"
+version = "0.1.0"
 edition = "2021"
 homepage = "https://github.com/ptechen"
-documentation = "https://github.com/ptechen/sql_reveser/blob/main/README.md"
-repository = "https://github.com/ptechen/sql_reveser.git"
+documentation = "https://github.com/ptechen/sql_reverse/blob/main/README.md"
+repository = "https://github.com/ptechen/sql_reverse.git"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 description = "sql reveser template"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sql_reveser_error = { version = "^0.1"}
+sql_reverse_error = { version = "^0.1"}
 async-std = "1.11.0"
 async-trait = "0.1.53"
 quicli = "0.4.0"
