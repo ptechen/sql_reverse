@@ -1,3 +1,6 @@
+#[macro_use]
+pub mod custom_macro;
+
 pub mod result;
 
 #[cfg(test)]

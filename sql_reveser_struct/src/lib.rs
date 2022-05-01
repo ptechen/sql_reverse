@@ -1,4 +1,8 @@
+#[macro_use]
+extern crate sql_reveser_error;
+
 pub mod common;
+pub mod gen_struct;
 pub mod mysql_struct;
 pub mod postgres_struct;
 

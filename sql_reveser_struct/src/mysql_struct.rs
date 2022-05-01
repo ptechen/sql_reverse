@@ -1,15 +1,13 @@
 use crate::common::CustomConfig;
+use crate::gen_struct::GenStruct;
 use async_trait::async_trait;
 use inflector::Inflector;
 use mysql::prelude::*;
 use mysql::Row;
 use mysql::*;
 use once_cell::sync::Lazy;
-use quicli::prelude::*;
 use regex::Regex;
-use serde::{Deserialize, Serialize};
 use sql_reveser_error::result::Result;
-use sql_reveser_template::gen_struct::GenStruct;
 use sql_reveser_template::table::{Field, Table};
 use std::collections::HashMap;
 
@@ -52,33 +50,33 @@ static FIELD_TYPE: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     map
 });
 
-#[derive(Default, Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Clone)]
 pub struct MysqlStruct {
     pub config: CustomConfig,
+    pub pool: Pool,
 }
 
 pub struct GenTemplateData {
     pub table_name: String,
     pub struct_name: String,
-    pub mysql_rows: Option<Vec<Row>>,
+    pub sql_rows: Vec<Row>,
     pub table_comment: String,
 }
 
 impl MysqlStruct {
     pub fn new(config: CustomConfig) -> Result<Self> {
-        Ok(Self { config })
-    }
-
-    pub fn load(filename: &str) -> Result<Self> {
-        let s = read_file(filename)?;
-        let config: CustomConfig = serde_yaml::from_str(&s)?;
-        Ok(Self { config })
+        let url = format!(
+            "mysql://{}@{}{}:{}/{}",
+            config.username, config.password, config.host, config.password, config.database
+        );
+        let opts = Opts::from_url(&url)?;
+        let pool = Pool::new(opts)?;
+        Ok(Self { config, pool })
     }
 
     async fn gen_template_data(&self, gen_template_data: GenTemplateData) -> Result<Table> {
         let mut fields = vec![];
-        let mysql_rows = gen_template_data.mysql_rows.unwrap();
-        for row in mysql_rows.iter() {
+        for row in gen_template_data.sql_rows.iter() {
             let field_name: String = row.get(0).unwrap();
             let mut field_type: String = row.get(1).unwrap();
             field_type = self.get_rust_type(&field_type).await?;
@@ -129,23 +127,9 @@ impl MysqlStruct {
         }
         Ok(list)
     }
-}
 
-#[async_trait]
-impl GenStruct for MysqlStruct {
-    async fn run(&self) -> Result<Vec<Table>> {
-        let url = format!(
-            "mysql://{}@{}{}:{}/{}",
-            self.config.username,
-            self.config.password,
-            self.config.host,
-            self.config.password,
-            self.config.database
-        );
-        let opts = Opts::from_url(&url)?;
-        let pool = Pool::new(opts)?;
-        let mut conn = pool.get_conn()?;
-        let tables;
+    async fn get_tables(&self) -> Result<Vec<String>> {
+        let mut tables;
         let include_tables = self.config.include_tables.as_ref();
         if include_tables.is_some() {
             tables = include_tables.unwrap().to_owned();
@@ -154,31 +138,38 @@ impl GenStruct for MysqlStruct {
                 "select table_name from information_schema.tables where table_schema= '{}'",
                 self.config.database
             );
+            let mut conn = self.pool.get_conn()?;
             tables = conn.query(sql)?;
+            let exclude_tables = self.config.exclude_tables.as_ref();
+            if exclude_tables.is_some() {
+                tables = async_ok!(self.filter_tables(tables, exclude_tables.unwrap().to_owned()))?;
+            }
         }
+        Ok(tables)
+    }
+
+    async fn get_tables_comment(&self) -> Result<HashMap<String, String>> {
+        let mut conn = self.pool.get_conn()?;
         let tables_status: Vec<Row> = conn.query("show table status").unwrap();
         let mut table_comment_map = HashMap::new();
         for row in tables_status.iter() {
             let table_name: String = row.get(0).unwrap();
             let table_comment: Option<String> = row.get(17);
-            if table_comment.is_some() {
-                let table_comment = table_comment.unwrap();
-                if table_comment != "" {
-                    table_comment_map.insert(table_name, table_comment);
-                };
-            };
+            table_comment_map.insert(table_name, table_comment.unwrap_or_default());
         }
-        let mut exclude_tables: Vec<String> = vec![];
-        if self.config.exclude_tables.is_some() {
-            exclude_tables = self.config.exclude_tables.as_ref().unwrap().to_owned();
-        };
+        Ok(table_comment_map)
+    }
+
+    async fn gen_templates(
+        &self,
+        tables: Vec<String>,
+        table_comment_map: HashMap<String, String>,
+    ) -> Result<Vec<Table>> {
         let mut templates = vec![];
+        let mut conn = self.pool.get_conn()?;
         for table_name in tables.iter() {
-            if exclude_tables.contains(table_name) {
-                continue;
-            };
             let sql = format!("show full columns from {}", table_name);
-            let mysql_rows: Vec<Row> = conn.query(&sql)?;
+            let sql_rows: Vec<Row> = conn.query(&sql)?;
             let mut struct_name = table_name.to_camel_case();
             struct_name = self.first_char_to_uppercase(&struct_name).await?;
             let default = &String::new();
@@ -186,17 +177,26 @@ impl GenStruct for MysqlStruct {
                 .get(table_name)
                 .unwrap_or(default)
                 .to_string();
-            let mysql_rows = Some(mysql_rows);
             let gen_template_data = GenTemplateData {
                 table_name: table_name.to_owned(),
                 struct_name,
-                mysql_rows,
+                sql_rows,
                 table_comment,
             };
             let mut table = self.gen_template_data(gen_template_data).await?;
             table.index_key = self.index_key(&mut conn, table_name).await?;
             templates.push(table);
         }
+        Ok(templates)
+    }
+}
+
+#[async_trait]
+impl GenStruct for MysqlStruct {
+    async fn run(&self) -> Result<Vec<Table>> {
+        let tables = async_ok!(self.get_tables())?;
+        let table_comment_map = async_ok!(self.get_tables_comment())?;
+        let templates = async_ok!(self.gen_templates(tables, table_comment_map))?;
         Ok(templates)
     }
 

@@ -1,20 +1,25 @@
 use app_arguments::{ApplicationArguments, Command};
 mod app_arguments;
+use sql_reveser_error::result::Result;
+use sql_reveser_struct::gen_struct::GenStruct;
 use sql_reveser_struct::mysql_struct;
+use sql_reveser_struct::mysql_struct::MysqlStruct;
 use sql_reveser_struct::postgres_struct;
-use sql_reveser_template::gen_struct::GenStruct;
+use sql_reveser_struct::postgres_struct::PostgresStruct;
 use sql_reveser_template::render::Render;
 use sql_reveser_template::table::Table;
-use sql_reveser_error::result::Result;
 use structopt::StructOpt;
+use tracing::Level;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    tracing_subscriber::fmt().with_max_level(Level::INFO).init();
     let args = ApplicationArguments::from_args();
     let key = args.command;
     match key {
         Command::Mysql(opt) => {
-            let mysql = mysql_struct::MysqlStruct::load(&opt.file).unwrap();
+            let config = mysql_struct::MysqlStruct::load(&opt.file).await?;
+            let mysql = MysqlStruct::new(config)?;
             let tables = mysql.run().await?;
             Table::render_rust(
                 &opt.template_path,
@@ -26,8 +31,16 @@ async fn main() -> Result<()> {
         }
 
         Command::Postgres(opt) => {
-            let mysql = postgres_struct::PostgresStruct::load(&opt.file).unwrap();
-            let tables = mysql.run().await?;
+            let config = postgres_struct::PostgresStruct::load(&opt.file).await?;
+            let postgres = PostgresStruct::new(config).await?;
+            let tables = postgres.run().await?;
+            Table::render_rust(
+                &opt.template_path,
+                &opt.template_name,
+                &postgres.config.output_dir,
+                &tables,
+            )
+                .await?;
         }
     }
     Ok(())

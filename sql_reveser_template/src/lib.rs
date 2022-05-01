@@ -1,4 +1,8 @@
-pub mod gen_struct;
+#[macro_use]
+extern crate sql_reveser_error;
+
+
+
 pub mod render;
 pub mod table;
 

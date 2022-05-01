@@ -1,9 +1,9 @@
-username: test
+username: root
 password: ''
 host: 127.0.0.1
-port: 5432
+port: 3306
 database: kb
-schemaname: test # only postgres enable
+schemaname: test1 # only postgres enable
 include_tables: # Include tables, can be ignored.
 #  - table_name
 exclude_tables: # Exclude, tables, can be ignored.

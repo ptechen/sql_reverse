@@ -10,7 +10,7 @@ description = "sql reveser struct"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sql_reveser_error = { version = "^0.1" }
+sql_reveser_error = { path = "../sql_reveser_error"}
 sql_reveser_template = { path = "../sql_reveser_template"}
 async-trait = "0.1.53"
 mysql = "22.1.0"
@@ -23,3 +23,4 @@ Inflector = "0.11.4"
 tokio = "1"
 tokio-postgres = "0.7.6"
 postgres = "0.19.3"
+tracing = "0.1.34"

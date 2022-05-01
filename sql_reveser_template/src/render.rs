@@ -41,9 +41,9 @@ pub trait Render {
             let vv: Vec<&str> = content.split(FLAG).collect();
             let custom = vv.get(1).unwrap_or(&"").to_string();
             struct_str = struct_str + "\n" + FLAG + custom.as_str();
-            Self::write_to_file(&filepath, &struct_str).await?;
+            async_ok!(Self::write_to_file(&filepath, &struct_str))?;
         }
-        Self::append_to_file(mods, &mod_path).await?;
+        async_ok!(Self::append_to_file(mods, &mod_path))?;
         Ok(())
     }
 
@@ -57,12 +57,11 @@ pub trait Render {
         let file_content = read_file(filepath).unwrap_or_default();
         for v in mods.iter() {
             if !file_content.contains(v) {
-                let mut file = OpenOptions::new()
+                let mut file = async_ok!(OpenOptions::new()
                     .append(true)
                     .create(true)
-                    .open(filepath)
-                    .await?;
-                file.write(v.as_bytes()).await?;
+                    .open(filepath))?;
+                async_ok!(file.write(v.as_bytes()))?;
             };
         }
         Ok(())
