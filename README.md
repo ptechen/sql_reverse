@@ -11,15 +11,17 @@
 
 ## Exec，you need to make sure you're in the same directory as templates.
     sql_reveser mysql -f reverse.yml
+    sql_reveser postgres -f reverse.yml
 ## Custom Exec
     sql_reveser mysql -f reverse.yml -p 'templates/*' -n base.tera
-
+    sql_reveser postgres -f reverse.yml -p 'templates/*' -n base.tera
 ## reverse.yml
     host: 127.0.0.1
     post: 3306
     username: root
     password: ''
     database: db_name
+    schemaname: test # only postgres enable
     include_tables: # Include tables, can be ignored.
     #  - table_name
     exclude_tables: # Exclude, tables, can be ignored.
