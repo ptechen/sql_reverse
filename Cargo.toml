@@ -1,2 +1,2 @@
 [workspace]
-members = ["sql_reveser", "sql_reveser_struct", "sql_reveser_template", "sql_reveser_error"]
+members = ["sql_reverse", "sql_reverse_struct", "sql_reverse_template", "sql_reverse_error"]

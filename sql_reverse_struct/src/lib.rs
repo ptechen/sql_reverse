@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate sql_reveser_error;
+extern crate sql_reverse_error;
 
 pub mod common;
 pub mod gen_struct;

@@ -1,8 +1,8 @@
 use crate::common::CustomConfig;
 use crate::gen_struct::GenStruct;
 use async_trait::async_trait;
-use sql_reveser_error::result::Result;
-use sql_reveser_template::table::{Table, Field};
+use sql_reverse_error::result::Result;
+use sql_reverse_template::table::{Table, Field};
 use tokio_postgres::{Client, NoTls, Row};
 use std::collections::HashMap;
 use inflector::Inflector;

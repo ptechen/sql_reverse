@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use sql_reveser_error::result::Result;
-use sql_reveser_template::table::Table;
+use sql_reverse_error::result::Result;
+use sql_reverse_template::table::Table;
 use crate::common::CustomConfig;
 use quicli::prelude::read_file;
 

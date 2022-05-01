@@ -1,20 +1,20 @@
-# sql_reveser
+# sql_reverse
 
 # Generate the RUST structure based on the MySQL/PostgreSQL table structure
-[![Version info](https://img.shields.io/crates/v/sql_reveser.svg)](https://crates.io/crates/sql_reveser)
-[![Downloads](https://img.shields.io/crates/d/sql_reveser.svg?style=flat-square)](https://crates.io/crates/sql_reveser)
-[![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reveser)
-[![dependency status](https://deps.rs/crate/sql_reveser/0.1.0/status.svg)](https://deps.rs/crate/sql_reveser)
+[![Version info](https://img.shields.io/crates/v/sql_reverse.svg)](https://crates.io/crates/sql_reverse)
+[![Downloads](https://img.shields.io/crates/d/sql_reverse.svg?style=flat-square)](https://crates.io/crates/sql_reverse)
+[![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reverse)
+[![dependency status](https://deps.rs/crate/sql_reverse/0.1.0/status.svg)](https://deps.rs/crate/sql_reverse)
 
 ## Install
-    cargo install sql_reveser
+    cargo install sql_reverse
 
 ## Exec，you need to make sure you're in the same directory as templates.
-    sql_reveser mysql -f reverse.yml
-    sql_reveser postgres -f reverse.yml
+    sql_reverse mysql -f reverse.yml
+    sql_reverse postgres -f reverse.yml
 ## Custom Exec
-    sql_reveser mysql -f reverse.yml -p 'templates/*' -n base.tera
-    sql_reveser postgres -f reverse.yml -p 'templates/*' -n base.tera
+    sql_reverse mysql -f reverse.yml -p 'templates/*' -n base.tera
+    sql_reverse postgres -f reverse.yml -p 'templates/*' -n base.tera
 ## reverse.yml
     host: 127.0.0.1
     post: 3306

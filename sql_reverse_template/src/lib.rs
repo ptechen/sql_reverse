@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate sql_reveser_error;
+extern crate sql_reverse_error;
 
 
 

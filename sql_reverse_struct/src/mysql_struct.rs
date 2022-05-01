@@ -7,8 +7,8 @@ use mysql::Row;
 use mysql::*;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use sql_reveser_error::result::Result;
-use sql_reveser_template::table::{Field, Table};
+use sql_reverse_error::result::Result;
+use sql_reverse_template::table::{Field, Table};
 use std::collections::HashMap;
 
 static FIELD_TYPE: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {

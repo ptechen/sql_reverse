@@ -15,7 +15,7 @@ const FLAG: &'static str = "// ***************************************以下是�
 use crate::table::Table;
 use async_trait::async_trait;
 use quicli::prelude::*;
-use sql_reveser_error::result::Result;
+use sql_reverse_error::result::Result;
 use std::path::Path;
 use tera::{Context, Tera};
 

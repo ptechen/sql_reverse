@@ -1,13 +1,13 @@
 use app_arguments::{ApplicationArguments, Command};
 mod app_arguments;
-use sql_reveser_error::result::Result;
-use sql_reveser_struct::gen_struct::GenStruct;
-use sql_reveser_struct::mysql_struct;
-use sql_reveser_struct::mysql_struct::MysqlStruct;
-use sql_reveser_struct::postgres_struct;
-use sql_reveser_struct::postgres_struct::PostgresStruct;
-use sql_reveser_template::render::Render;
-use sql_reveser_template::table::Table;
+use sql_reverse_error::result::Result;
+use sql_reverse_struct::gen_struct::GenStruct;
+use sql_reverse_struct::mysql_struct;
+use sql_reverse_struct::mysql_struct::MysqlStruct;
+use sql_reverse_struct::postgres_struct;
+use sql_reverse_struct::postgres_struct::PostgresStruct;
+use sql_reverse_template::render::Render;
+use sql_reverse_template::table::Table;
 use structopt::StructOpt;
 use tracing::Level;
 
