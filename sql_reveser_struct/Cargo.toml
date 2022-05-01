@@ -11,7 +11,7 @@ description = "sql reveser struct"
 
 [dependencies]
 sql_reveser_error = { version = "^0.1" }
-sql_reveser_template = { path = "../sql_reveser_template"}
+sql_reveser_template = { version = "^0.1"}
 async-trait = "0.1.53"
 mysql = "22.1.0"
 once_cell = "1.10.0"
