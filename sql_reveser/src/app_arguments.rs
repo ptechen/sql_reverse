@@ -10,11 +10,13 @@ pub struct ApplicationArguments {
 #[derive(Debug, StructOpt)]
 pub enum Command {
     #[structopt(name = "mysql")]
-    Mysql(Mysql),
+    Mysql(Sql),
+    #[structopt(name = "postgres")]
+    Postgres(Sql),
 }
 
 #[derive(Debug, StructOpt)]
-pub struct Mysql {
+pub struct Sql {
     /// Input config file to read
     #[structopt(short = "f", default_value = "./reverse.yml")]
     pub file: String,

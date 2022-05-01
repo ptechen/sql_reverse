@@ -14,6 +14,7 @@ pub enum Error {
     TeraError(tera::Error),
     MysqlUrlError(mysql::UrlError),
     MysqlError(mysql::error::Error),
+    PostgresError(tokio_postgres::Error),
     CustomError(String),
 }
 
@@ -54,6 +55,7 @@ impl std::error::Error for Error {
             Error::TeraError(ref error) => Some(error),
             Error::MysqlUrlError(ref error) => Some(error),
             Error::MysqlError(ref error) => Some(error),
+            Error::PostgresError(ref error) => Some(error),
             Error::CustomError(ref error) => {
                 let s: CustomError = From::from(error.to_string());
                 Some(s.into())
@@ -71,6 +73,7 @@ impl std::fmt::Display for Error {
             Error::TeraError(ref error) => error.fmt(f),
             Error::MysqlUrlError(ref error) => error.fmt(f),
             Error::MysqlError(ref error) => error.fmt(f),
+            Error::PostgresError(ref error) => error.fmt(f),
             Error::CustomError(ref error) => error.fmt(f),
         }
     }
@@ -85,6 +88,12 @@ impl From<String> for Error {
 impl From<mysql::error::Error> for Error {
     fn from(error: mysql::error::Error) -> Self {
         Error::MysqlError(error)
+    }
+}
+
+impl From<tokio_postgres::Error> for Error {
+    fn from(error: tokio_postgres::Error) -> Self {
+        Error::PostgresError(error)
     }
 }
 

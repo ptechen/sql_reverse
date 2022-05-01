@@ -1,4 +1,6 @@
+pub mod common;
 pub mod mysql_struct;
+pub mod postgres_struct;
 
 #[cfg(test)]
 mod tests {

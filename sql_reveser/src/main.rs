@@ -1,6 +1,7 @@
 use app_arguments::{ApplicationArguments, Command};
 mod app_arguments;
 use sql_reveser_struct::mysql_struct;
+use sql_reveser_struct::postgres_struct;
 use sql_reveser_template::gen_struct::GenStruct;
 use sql_reveser_template::render::Render;
 use sql_reveser_template::table::Table;
@@ -22,6 +23,11 @@ async fn main() -> Result<()> {
                 &tables,
             )
             .await?;
+        }
+
+        Command::Postgres(opt) => {
+            let mysql = postgres_struct::PostgresStruct::load(&opt.file).unwrap();
+            let tables = mysql.run().await?;
         }
     }
     Ok(())

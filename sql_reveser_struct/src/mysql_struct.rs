@@ -1,3 +1,4 @@
+use crate::common::CustomConfig;
 use async_trait::async_trait;
 use inflector::Inflector;
 use mysql::prelude::*;
@@ -56,18 +57,6 @@ pub struct MysqlStruct {
     pub config: CustomConfig,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize, Clone)]
-pub struct CustomConfig {
-    pub host: String,
-    pub port: String,
-    pub username: String,
-    pub password: String,
-    pub database: String,
-    pub include_tables: Option<Vec<String>>,
-    pub exclude_tables: Option<Vec<String>>,
-    pub output_dir: String,
-}
-
 pub struct GenTemplateData {
     pub table_name: String,
     pub struct_name: String,
@@ -76,14 +65,14 @@ pub struct GenTemplateData {
 }
 
 impl MysqlStruct {
-    pub fn new(config: CustomConfig) -> Result<MysqlStruct> {
-        Ok(MysqlStruct { config })
+    pub fn new(config: CustomConfig) -> Result<Self> {
+        Ok(Self { config })
     }
 
-    pub fn load(filename: &str) -> Result<MysqlStruct> {
+    pub fn load(filename: &str) -> Result<Self> {
         let s = read_file(filename)?;
         let config: CustomConfig = serde_yaml::from_str(&s)?;
-        MysqlStruct::new(config)
+        Ok(Self { config })
     }
 
     async fn gen_template_data(&self, gen_template_data: GenTemplateData) -> Result<Table> {
