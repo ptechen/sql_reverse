@@ -4,7 +4,7 @@
 [![Version info](https://img.shields.io/crates/v/sql_reveser.svg)](https://crates.io/crates/sql_reveser)
 [![Downloads](https://img.shields.io/crates/d/sql_reveser.svg?style=flat-square)](https://crates.io/crates/sql_reveser)
 [![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reveser)
-[![dependency status](https://deps.rs/crate/sql_reveser/0.1.11/status.svg)](https://deps.rs/crate/sql_reveser)
+[![dependency status](https://deps.rs/crate/sql_reveser/0.1.0/status.svg)](https://deps.rs/crate/sql_reveser)
 
 ## Install
     cargo install sql_reveser
@@ -41,7 +41,7 @@
         pub field_type: String,
         pub comment: String,
         /// 1: 是, 0: 否
-        pub is_null: String,
+        pub is_null: u8,
     }
 
 ## Template:

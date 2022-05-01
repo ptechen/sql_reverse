@@ -12,12 +12,8 @@ pub struct Table {
     pub fields: Vec<Field>,
     /// 表注释
     pub comment: String,
-    /// 主键
-    pub primary_key: Vec<String>,
     /// 索引
-    pub index: Vec<String>,
-    /// 唯一索引
-    pub unique: Vec<String>,
+    pub index_key: Vec<Vec<String>>,
 }
 
 /// sql 字段
@@ -29,7 +25,7 @@ pub struct Field {
     pub field_type: String,
     /// 注释
     pub comment: String,
-    /// 默认值是否为null, 1: is_null 0: not_null
+    /// 默认值是否为null, 1: 是 0: 不是
     pub is_null: u8,
 }
 
@@ -45,9 +41,7 @@ impl Table {
             struct_name,
             fields,
             comment,
-            primary_key: vec![],
-            index: vec![],
-            unique: vec![],
+            index_key: vec![],
         }
     }
 }
