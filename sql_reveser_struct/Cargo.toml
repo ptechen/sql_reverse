@@ -1,6 +1,6 @@
 [package]
 name = "sql_reveser_struct"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 documentation = "https://github.com/ptechen/sql_reveser/blob/main/README.md"
 repository = "https://github.com/ptechen/sql_reveser.git"
@@ -10,8 +10,8 @@ description = "sql reveser struct"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sql_reveser_error = { path = "../sql_reveser_error"}
-sql_reveser_template = { path = "../sql_reveser_template"}
+sql_reveser_error = { version = "^0.1" }
+sql_reveser_template = { version = "^0.1" }
 async-trait = "0.1.53"
 mysql = "22.1.0"
 once_cell = "1.10.0"
