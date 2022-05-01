@@ -1,6 +1,6 @@
 # sql_reveser
 
-# Generate the RUST structure based on the MySQL table structure
+# Generate the RUST structure based on the MySQL/PostgreSQL table structure
 [![Version info](https://img.shields.io/crates/v/sql_reveser.svg)](https://crates.io/crates/sql_reveser)
 [![Downloads](https://img.shields.io/crates/d/sql_reveser.svg?style=flat-square)](https://crates.io/crates/sql_reveser)
 [![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reveser)
