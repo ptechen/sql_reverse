@@ -1,6 +1,6 @@
 # sql_reveser
 
-# Generate the RUST structure based on the MySQL table structure
+# Generate the RUST structure based on the MySQL/PostgreSQL table structure
 [![Version info](https://img.shields.io/crates/v/sql_reveser.svg)](https://crates.io/crates/sql_reveser)
 [![Downloads](https://img.shields.io/crates/d/sql_reveser.svg?style=flat-square)](https://crates.io/crates/sql_reveser)
 [![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reveser)
@@ -11,15 +11,17 @@
 
 ## Exec，you need to make sure you're in the same directory as templates.
     sql_reveser mysql -f reverse.yml
+    sql_reveser postgres -f reverse.yml
 ## Custom Exec
     sql_reveser mysql -f reverse.yml -p 'templates/*' -n base.tera
-
+    sql_reveser postgres -f reverse.yml -p 'templates/*' -n base.tera
 ## reverse.yml
     host: 127.0.0.1
     post: 3306
     username: root
     password: ''
     database: db_name
+    schemaname: test # only postgres enable
     include_tables: # Include tables, can be ignored.
     #  - table_name
     exclude_tables: # Exclude, tables, can be ignored.
@@ -40,6 +42,8 @@
         pub field_name: String,
         pub field_type: String,
         pub comment: String,
+        /// only supported mysql
+        pub index_key: Vec<Vec<String>>
         /// 1: 是, 0: 否
         pub is_null: u8,
     }
@@ -58,7 +62,11 @@
         {% if v.comment -%}
             /// {{ v.comment }}
         {% endif -%}
-        pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+        {% if v.is_null == 1 -%}
+            pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+        {%- else -%}
+            pub {{ v.field_name }}: {{ v.field_type }},
+        {%- endif -%}
     {%- endfor %}
     }
 
