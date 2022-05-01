@@ -42,6 +42,8 @@
         pub field_name: String,
         pub field_type: String,
         pub comment: String,
+        /// only supported mysql
+        pub index_key: Vec<Vec<String>>
         /// 1: 是, 0: 否
         pub is_null: u8,
     }
