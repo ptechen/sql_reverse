@@ -11,7 +11,7 @@ description = "sql reveser template"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sql_reverse_struct = { path = "../sql_reverse_struct"}
+sql_reverse_struct = { version = "^0.1"}
 sql_reverse_error = { version = "^0.1" }
 quicli = "0.4.0"
 sql_reverse_template = { version = "^0.1" , features = ["tokio"], default_features = false}
