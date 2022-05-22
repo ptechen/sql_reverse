@@ -57,10 +57,8 @@ pub trait Render {
         let file_content = read_file(filepath).unwrap_or_default();
         for v in mods.iter() {
             if !file_content.contains(v) {
-                let mut file = async_ok!(OpenOptions::new()
-                    .append(true)
-                    .create(true)
-                    .open(filepath))?;
+                let mut file =
+                    async_ok!(OpenOptions::new().append(true).create(true).open(filepath))?;
                 async_ok!(file.write(v.as_bytes()))?;
             };
         }

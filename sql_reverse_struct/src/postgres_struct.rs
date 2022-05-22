@@ -1,13 +1,12 @@
 use crate::common::CustomConfig;
 use crate::gen_struct::GenStruct;
 use async_trait::async_trait;
-use sql_reverse_error::result::Result;
-use sql_reverse_template::table::{Table, Field};
-use tokio_postgres::{Client, NoTls, Row};
-use std::collections::HashMap;
 use inflector::Inflector;
 use once_cell::sync::Lazy;
-use regex::Regex;
+use sql_reverse_error::result::Result;
+use sql_reverse_template::table::{Field, Table};
+use std::collections::HashMap;
+use tokio_postgres::{Client, NoTls, Row};
 
 static FIELD_TYPE: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     let mut map = HashMap::new();
@@ -74,6 +73,41 @@ impl PostgresStruct {
         Ok(Self { config, client })
     }
 
+    async fn gen_template_data(&self, gen_template_data: GenTemplateData) -> Result<Table> {
+        let mut fields = vec![];
+        for row in gen_template_data.sql_rows.iter() {
+            let field_name: String = row.get(0);
+            if field_name.contains("drop") {
+                continue;
+            }
+            let mut field_type: String = row.get(1);
+            field_type = async_ok!(self.get_rust_type(&field_type, FIELD_TYPE.clone()))?;
+            let is_null: bool = row.get(2);
+            let mut cur_is_null = 0;
+            if is_null == false {
+                cur_is_null = 1;
+            }
+            let comment: Option<String> = row.get(3);
+            let field = Field {
+                field_name,
+                field_type,
+                comment: comment.unwrap_or_default(),
+                is_null: cur_is_null,
+            };
+            fields.push(field);
+        }
+        let temp = Table::new(
+            gen_template_data.table_name,
+            gen_template_data.struct_name,
+            fields,
+            gen_template_data.table_comment,
+        );
+        Ok(temp)
+    }
+}
+
+#[async_trait]
+impl GenStruct for PostgresStruct {
     async fn get_tables(&self) -> Result<Vec<String>> {
         let mut tables = vec![];
         let include_tables = self.config.include_tables.as_ref();
@@ -152,57 +186,5 @@ FROM pg_class as c,pg_attribute as a where c.relname = '{}' and a.attrelid = c.o
             templates.push(table);
         }
         Ok(templates)
-    }
-
-    async fn gen_template_data(&self, gen_template_data: GenTemplateData) -> Result<Table> {
-        let mut fields = vec![];
-        for row in gen_template_data.sql_rows.iter() {
-            let field_name:String = row.get(0);
-            if field_name.contains("drop") {
-                continue;
-            }
-            let mut field_type:String = row.get(1);
-            field_type = async_ok!(self.get_rust_type(&field_type))?;
-            let is_null:bool = row.get(2);
-            let mut cur_is_null = 0;
-            if is_null == false {
-                cur_is_null = 1;
-            }
-            let comment: Option<String> = row.get(3);
-            let field = Field {
-                field_name,
-                field_type,
-                comment:comment.unwrap_or_default(),
-                is_null: cur_is_null,
-            };
-            fields.push(field);
-        }
-        let temp = Table::new(
-            gen_template_data.table_name,
-            gen_template_data.struct_name,
-            fields,
-            gen_template_data.table_comment,
-        );
-        Ok(temp)
-    }
-}
-
-#[async_trait]
-impl GenStruct for PostgresStruct {
-    async fn run(&self) -> Result<Vec<Table>> {
-        let tables = async_ok!(self.get_tables())?;
-        let table_comment_map = async_ok!(self.get_tables_comment())?;
-        let templates = async_ok!(self.gen_templates(tables, table_comment_map))?;
-        Ok(templates)
-    }
-
-    async fn get_rust_type(&self, field_type: &str) -> Result<String> {
-        for (k, v) in FIELD_TYPE.iter() {
-            let r = Regex::new(k.trim()).unwrap();
-            if r.is_match(&field_type) {
-                return Ok(v.to_string());
-            }
-        }
-        Ok(String::new())
     }
 }

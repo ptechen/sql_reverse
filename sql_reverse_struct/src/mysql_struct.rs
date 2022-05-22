@@ -6,7 +6,6 @@ use mysql::prelude::*;
 use mysql::Row;
 use mysql::*;
 use once_cell::sync::Lazy;
-use regex::Regex;
 use sql_reverse_error::result::Result;
 use sql_reverse_template::table::{Field, Table};
 use std::collections::HashMap;
@@ -79,7 +78,7 @@ impl MysqlStruct {
         for row in gen_template_data.sql_rows.iter() {
             let field_name: String = row.get(0).unwrap();
             let mut field_type: String = row.get(1).unwrap();
-            field_type = self.get_rust_type(&field_type).await?;
+            field_type = self.get_rust_type(&field_type, FIELD_TYPE.clone()).await?;
             let is_null: String = row.get(3).unwrap_or_default();
             let mut cur_is_null = 0;
             if is_null == "YES" {
@@ -127,7 +126,10 @@ impl MysqlStruct {
         }
         Ok(list)
     }
+}
 
+#[async_trait]
+impl GenStruct for MysqlStruct {
     async fn get_tables(&self) -> Result<Vec<String>> {
         let mut tables;
         let include_tables = self.config.include_tables.as_ref();
@@ -188,25 +190,5 @@ impl MysqlStruct {
             templates.push(table);
         }
         Ok(templates)
-    }
-}
-
-#[async_trait]
-impl GenStruct for MysqlStruct {
-    async fn run(&self) -> Result<Vec<Table>> {
-        let tables = async_ok!(self.get_tables())?;
-        let table_comment_map = async_ok!(self.get_tables_comment())?;
-        let templates = async_ok!(self.gen_templates(tables, table_comment_map))?;
-        Ok(templates)
-    }
-
-    async fn get_rust_type(&self, field_type: &str) -> Result<String> {
-        for (k, v) in FIELD_TYPE.iter() {
-            let r = Regex::new(k.trim()).unwrap();
-            if r.is_match(&field_type) {
-                return Ok(v.to_string());
-            }
-        }
-        Ok(String::new())
     }
 }

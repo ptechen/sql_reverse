@@ -40,7 +40,7 @@ async fn main() -> Result<()> {
                 &postgres.config.output_dir,
                 &tables,
             )
-                .await?;
+            .await?;
         }
     }
     Ok(())

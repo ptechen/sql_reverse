@@ -1,8 +1,6 @@
 #[macro_use]
 extern crate sql_reverse_error;
 
-
-
 pub mod render;
 pub mod table;
 

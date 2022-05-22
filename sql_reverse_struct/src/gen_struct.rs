@@ -1,14 +1,39 @@
+use crate::common::CustomConfig;
 use async_trait::async_trait;
+use quicli::prelude::read_file;
 use sql_reverse_error::result::Result;
 use sql_reverse_template::table::Table;
-use crate::common::CustomConfig;
-use quicli::prelude::read_file;
+use std::collections::HashMap;
+use regex::Regex;
 
 #[async_trait]
 pub trait GenStruct {
-    async fn run(&self) -> Result<Vec<Table>>;
+    async fn run(&self) -> Result<Vec<Table>> {
+        let tables = async_ok!(self.get_tables())?;
+        let table_comment_map = async_ok!(self.get_tables_comment())?;
+        let templates = async_ok!(self.gen_templates(tables, table_comment_map))?;
+        Ok(templates)
+    }
 
-    async fn get_rust_type(&self, field_type: &str) -> Result<String>;
+    async fn get_tables(&self) -> Result<Vec<String>>;
+
+    async fn get_tables_comment(&self) -> Result<HashMap<String, String>>;
+
+    async fn gen_templates(
+        &self,
+        tables: Vec<String>,
+        table_comment_map: HashMap<String, String>,
+    ) -> Result<Vec<Table>>;
+
+    async fn get_rust_type(&self, field_type: &str, field_type_map: HashMap<&str, &str>) -> Result<String> {
+        for (k, v) in field_type_map.iter() {
+            let r = Regex::new(k.trim()).unwrap();
+            if r.is_match(&field_type) {
+                return Ok(v.to_string());
+            }
+        }
+        Ok(String::new())
+    }
 
     /// 字符串首字母大写
     async fn first_char_to_uppercase(&self, params: &str) -> Result<String> {
