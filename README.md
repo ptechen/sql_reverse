@@ -17,7 +17,7 @@
     sql_reverse postgres -f reverse.yml -p 'templates/*' -n base.tera
 ## reverse.yml
     host: 127.0.0.1
-    post: 3306
+    port: 3306
     username: root
     password: ''
     database: db_name
@@ -35,6 +35,8 @@
         pub struct_name: String,
         pub fields: Vec<Field>, 
         pub comment: String,
+        /// only supported mysql
+        pub index_key: Vec<Vec<String>>
     }
 
     #[derive(Serialize, Clone)]
@@ -42,8 +44,6 @@
         pub field_name: String,
         pub field_type: String,
         pub comment: String,
-        /// only supported mysql
-        pub index_key: Vec<Vec<String>>
         /// 1: 是, 0: 否
         pub is_null: u8,
     }
