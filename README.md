@@ -1,6 +1,6 @@
 # sql_reverse
 
-# Generate the RUST structure based on the MySQL/PostgreSQL table structure
+# Generate the RUST structure based on the MySQL/PostgresSQL table structure
 [![Version info](https://img.shields.io/crates/v/sql_reverse.svg)](https://crates.io/crates/sql_reverse)
 [![Downloads](https://img.shields.io/crates/d/sql_reverse.svg?style=flat-square)](https://crates.io/crates/sql_reverse)
 [![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reverse)
@@ -51,12 +51,13 @@
 ## Template:
     use serde_derive;
     use chrono::prelude::*;
-
+    use serde::{Deserialize, Serialize};
+    
     {% if template.comment -%}
         /// {{ template.comment }}
     {% endif -%}
     #[crud_table]
-    #[derive(Default, Debug, Clone, PartialEq, serde_derive::Serialize, serde_derive::Deserialize)]
+    #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
     pub struct {{ template.struct_name }} {
     {%- for v in template.fields %}
         {% if v.comment -%}
@@ -65,10 +66,15 @@
         {% if v.is_null == 1 -%}
             pub {{ v.field_name }}: Option<{{ v.field_type }}>,
         {%- else -%}
-            pub {{ v.field_name }}: {{ v.field_type }},
+            {% if v.field_type == 'NaiveDateTime' -%}
+                pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+            {%- else -%}
+                pub {{ v.field_name }}: {{ v.field_type }},
+            {%- endif -%}
         {%- endif -%}
     {%- endfor %}
     }
+
 
 ## Gen Struct Example:
     use serde_derive;

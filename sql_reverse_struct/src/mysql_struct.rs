@@ -67,7 +67,7 @@ impl MysqlStruct {
     pub fn new(config: CustomConfig) -> Result<Self> {
         let url = format!(
             "mysql://{}@{}{}:{}/{}",
-            config.username, config.password, config.host, config.password, config.database
+            config.username, config.password, config.host, config.port, config.database
         );
         let opts = Opts::from_url(&url)?;
         let pool = Pool::new(opts)?;

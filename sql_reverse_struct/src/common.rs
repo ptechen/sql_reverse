@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default, Debug, Deserialize, Serialize, Clone)]
 pub struct CustomConfig {
     pub host: String,
-    pub port: String,
+    pub port: u16,
     pub username: String,
     pub password: String,
     pub database: String,

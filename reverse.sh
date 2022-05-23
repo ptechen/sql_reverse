@@ -1,6 +1,6 @@
-sql_reverse mysql -f reverse_mysql.yml -p 'templates/*' -n base.tera
+#sql_reverse mysql -f reverse_mysql.yml
 
-#sql_reverse postgres -f reverse.yml -p 'templates/*' -n base.tera
+sql_reverse postgres -f reverse.yml
 
 
 #cargo install sql_reverse

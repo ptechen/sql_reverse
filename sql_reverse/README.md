@@ -17,7 +17,7 @@
     sql_reverse postgres -f reverse.yml -p 'templates/*' -n base.tera
 ## reverse.yml
     host: 127.0.0.1
-    post: 3306
+    port: 3306
     username: root
     password: ''
     database: db_name
@@ -51,12 +51,13 @@
 ## Template:
     use serde_derive;
     use chrono::prelude::*;
-
+    use serde::{Deserialize, Serialize};
+    
     {% if template.comment -%}
         /// {{ template.comment }}
     {% endif -%}
     #[crud_table]
-    #[derive(Default, Debug, Clone, PartialEq, serde_derive::Serialize, serde_derive::Deserialize)]
+    #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
     pub struct {{ template.struct_name }} {
     {%- for v in template.fields %}
         {% if v.comment -%}
@@ -65,7 +66,11 @@
         {% if v.is_null == 1 -%}
             pub {{ v.field_name }}: Option<{{ v.field_type }}>,
         {%- else -%}
-            pub {{ v.field_name }}: {{ v.field_type }},
+            {% if v.field_type == 'NaiveDateTime' -%}
+                pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+            {%- else -%}
+                pub {{ v.field_name }}: {{ v.field_type }},
+            {%- endif -%}
         {%- endif -%}
     {%- endfor %}
     }

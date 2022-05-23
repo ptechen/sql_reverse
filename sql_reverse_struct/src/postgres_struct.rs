@@ -63,6 +63,7 @@ impl PostgresStruct {
             .password(&config.password)
             .dbname(&config.database)
             .host(&config.host)
+            .port(config.port)
             .connect(NoTls)
             .await?;
         tokio::spawn(async move {
