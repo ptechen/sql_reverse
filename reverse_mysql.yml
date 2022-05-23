@@ -2,7 +2,7 @@ username: root
 password: ''
 host: 127.0.0.1
 port: 3306
-database: kb
+database: blog
 schemaname: test1 # only postgres enable
 include_tables: # Include tables, can be ignored.
 #  - table_name

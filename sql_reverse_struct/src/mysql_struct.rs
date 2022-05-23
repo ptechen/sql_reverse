@@ -46,6 +46,7 @@ static FIELD_TYPE: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     map.insert(r"char", "String");
     map.insert(r"text", "String");
     map.insert(r"blob", "Vec<u8>");
+    map.insert(r"^json$", "String");
     map
 });
 
