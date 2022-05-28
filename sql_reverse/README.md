@@ -10,12 +10,40 @@
 ## Install
     cargo install sql_reverse
 
+## sql_reverse <SUBCOMMAND>
+    USAGE:
+    sql_reverse <SUBCOMMAND>
+
+    FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+    
+    SUBCOMMANDS:
+    help        Prints this message or the help of the given subcommand(s)
+    mysql       
+    postgres
+
+## sql_reverse mysql [OPTIONS]
+    USAGE:
+    sql_reverse mysql/postgres [OPTIONS]
+
+    FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+    
+    OPTIONS:
+    -f <file>                 Input config file to read [default: ./reverse.yml]
+    -s <suffix>               Suffix of the generated file [default: rs]
+    -n <template-name>        Input template name [default: base.tera]
+    -p <template-path>        Input template path [default: templates/*]
+
+
 ## Exec，you need to make sure you're in the same directory as templates.
     sql_reverse mysql -f reverse.yml
     sql_reverse postgres -f reverse.yml
 ## Custom Exec
-    sql_reverse mysql -f reverse.yml -p 'templates/*' -n base.tera
-    sql_reverse postgres -f reverse.yml -p 'templates/*' -n base.tera
+    sql_reverse mysql -f reverse.yml -p 'templates/*' -s rs -n base.tera
+    sql_reverse postgres -f reverse.yml -p 'templates/*' -s rs -n base.tera
 ## reverse.yml
     host: 127.0.0.1
     port: 3306
