@@ -11,7 +11,7 @@ description = "sql reverse struct"
 
 [dependencies]
 sql_reverse_error = { version = "^0.1" }
-sql_reverse_template = { path = "../sql_reverse_template" }
+sql_reverse_template = { version = "^0.1" }
 async-trait = "0.1.53"
 mysql = "22.1.0"
 once_cell = "1.10.0"
