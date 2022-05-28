@@ -23,7 +23,7 @@
     mysql       
     postgres
 
-## sql_reverse mysql [OPTIONS]
+## sql_reverse mysql/postgres [OPTIONS]
     USAGE:
     sql_reverse mysql/postgres [OPTIONS]
 
