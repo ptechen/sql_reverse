@@ -24,26 +24,30 @@ pub trait Render {
     async fn render_rust(
         template_path: &str,
         template_name: &str,
+        suffix: &str,
         output_dir: &str,
         tables: &Vec<Table>,
     ) -> Result<()> {
         create_dir(output_dir)?;
         let tera = Tera::new(template_path)?;
         let mut context = Context::new();
-        let mod_path = format!("{}/mod.rs", output_dir);
+
         let mut mods = vec![];
         for table in tables {
             mods.push(format!("pub mod {};\n", table.table_name));
             context.insert("template", table);
             let mut struct_str = tera.render(template_name, &context)?;
-            let filepath = format!("{}/{}.rs", output_dir, table.table_name);
+            let filepath = format!("{}/{}.{}", output_dir, table.table_name, suffix);
             let content = read_file(&filepath).unwrap_or_default();
             let vv: Vec<&str> = content.split(FLAG).collect();
             let custom = vv.get(1).unwrap_or(&"").to_string();
             struct_str = struct_str + "\n" + FLAG + custom.as_str();
             async_ok!(Self::write_to_file(&filepath, &struct_str))?;
         }
-        async_ok!(Self::append_to_file(mods, &mod_path))?;
+        if suffix == "rs" {
+            let mod_path = format!("{}/mod.{}", output_dir, suffix);
+            async_ok!(Self::append_to_file(mods, &mod_path))?;
+        }
         Ok(())
     }
 

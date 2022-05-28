@@ -26,4 +26,7 @@ pub struct Sql {
     /// Input template name
     #[structopt(short = "n", default_value = "base.tera")]
     pub template_name: String,
+    /// Suffix of the generated file
+    #[structopt(short = "s", default_value = "rs")]
+    pub suffix: String,
 }

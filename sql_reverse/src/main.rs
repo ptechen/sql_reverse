@@ -24,6 +24,7 @@ async fn main() -> Result<()> {
             Table::render_rust(
                 &opt.template_path,
                 &opt.template_name,
+                &opt.suffix,
                 &mysql.config.output_dir,
                 &tables,
             )
@@ -37,6 +38,7 @@ async fn main() -> Result<()> {
             Table::render_rust(
                 &opt.template_path,
                 &opt.template_name,
+                &opt.suffix,
                 &postgres.config.output_dir,
                 &tables,
             )
