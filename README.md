@@ -13,37 +13,43 @@
 ## sql_reverse <SUBCOMMAND>
     USAGE:
     sql_reverse <SUBCOMMAND>
-
+    
     FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
     
     SUBCOMMANDS:
+    export      Export default database field types
     help        Prints this message or the help of the given subcommand(s)
-    mysql       
-    postgres
+    mysql       Mysql OPTIONS
+    postgres    PostgresSQL OPTIONS
+
+
 
 ## sql_reverse mysql/postgres [OPTIONS]
     USAGE:
     sql_reverse mysql/postgres [OPTIONS]
-
+    
     FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
     
     OPTIONS:
-    -f <file>                 Input config file to read [default: ./reverse.yml]
-    -s <suffix>               Suffix of the generated file [default: rs]
-    -n <template-name>        Input template name [default: base.tera]
-    -p <template-path>        Input template path [default: templates/*]
+    -c <custom-field-type>        Custom field type [default: ./default.json]
+    -f <file>                     Input config file to read [default: ./reverse.yml]
+    -s <suffix>                   Suffix of the generated file [default: rs]
+    -n <template-name>            Input template name [default: base.tera]
+    -p <template-path>            Input template path [default: templates/*]
 
 
 ## Exec，you need to make sure you're in the same directory as templates.
+    sql_reverse export
     sql_reverse mysql -f reverse.yml
     sql_reverse postgres -f reverse.yml
 ## Custom Exec
-    sql_reverse mysql -f reverse.yml -p 'templates/*' -s rs -n base.tera
-    sql_reverse postgres -f reverse.yml -p 'templates/*' -s rs -n base.tera
+    sql_reverse export
+    sql_reverse mysql -f reverse.yml -p 'templates/*' -s rs -n base.tera -c ./mysql_default.json
+    sql_reverse postgres -f reverse.yml -p 'templates/*' -s rs -n base.tera -c ./postgres_default.json
 ## reverse.yml
     host: 127.0.0.1
     port: 3306
@@ -82,18 +88,21 @@
     use chrono::prelude::*;
     use serde::{Deserialize, Serialize};
     
-    {% if template.comment -%}
-        /// {{ template.comment }}
+    {% if table.comment -%}
+    	/// {{ table.comment }}
     {% endif -%}
+    {% for index in table.index_key -%}
+        /// 索引：{{index}}
+    {% endfor -%}
     #[crud_table]
     #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-    pub struct {{ template.struct_name }} {
-    {%- for v in template.fields %}
-        {% if v.comment -%}
-            /// {{ v.comment }}
-        {% endif -%}
-        {% if v.is_null == 1 -%}
-            pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+    pub struct {{ table.struct_name }} {
+    {%- for v in table.fields %}
+    	{% if v.comment -%}
+    	    /// {{ v.comment }} {% if v.database_field_type %} field_type: {{ v.database_field_type }}{% endif %}{% if v.default %} default: {{ v.default }}{% endif %} {% if v.default == '' %} default: ''{% endif %}
+    	{% endif -%}
+    	{% if v.is_null == 1 -%}
+        	pub {{ v.field_name }}: Option<{{ v.field_type }}>,
         {%- else -%}
             {% if v.field_type == 'NaiveDateTime' -%}
                 pub {{ v.field_name }}: Option<{{ v.field_type }}>,
@@ -103,26 +112,30 @@
         {%- endif -%}
     {%- endfor %}
     }
-
 ## Gen Struct Example:
-    use serde_derive;
-    use chrono::prelude::*;
-    
-    /// Test
-    #[crud_table]
-    #[derive(Default, Debug, Clone, PartialEq, serde_derive::Serialize, serde_derive::Deserialize)
-    pub struct Test {
-        pub id: Option<u32>,
-        /// uuid
-        pub uuid: Option<String>,
-        /// 数据
-        pub content: Option<String>,
-        /// 版本
-        pub version: Option<i8>,
-        /// 1:删除, 0:未删除
-        pub is_deleted: Option<u8>,
-        /// 更新时间
-        pub updated_at: Option<NaiveDateTime>,
-        /// 创建时间
-        pub created_at: Option<NaiveDateTime>,
-    }
+	use serde_derive;
+	use chrono::prelude::*;
+	use serde::{Deserialize, Serialize};
+	
+	/// 用户信息
+	/// 索引：[article_id]
+	#[crud_table]
+	#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+	pub struct Article {
+		pub article_id: u64,
+		/// 用户id  field_type: varchar(16)  default: ''
+		pub user_id: Option<String>,
+		/// 用户类型  field_type: tinyint default: 0 
+		pub user_type: i8,
+		/// 文章名  field_type: varchar(32)  default: ''
+		pub article_title: String,
+		/// 内容简述  field_type: text 
+		pub article_content: String,
+		/// 头像  field_type: varchar(128)  default: ''
+		pub article_url: String,
+		/// 点赞数  field_type: int unsigned default: 0 
+		pub likes: u32,
+		pub is_deleted: u8,
+		pub updated_at: Option<NaiveDateTime>,
+		pub created_at: Option<NaiveDateTime>,
+	}
