@@ -43,8 +43,8 @@ pub trait GenStruct {
                 return Ok(v.to_string());
             }
         }
-        println!("The '{}' field type not matched", field_type);
-        Ok(String::new())
+        println!("'{}' field type does not match, default type String will be used", field_type);
+        Ok(String::from("String"))
     }
 
     /// 字符串首字母大写
