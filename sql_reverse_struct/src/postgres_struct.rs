@@ -7,39 +7,40 @@ use sql_reverse_error::result::Result;
 use sql_reverse_template::table::{Field, Table};
 use std::collections::HashMap;
 use tokio_postgres::{Client, NoTls, Row};
+use regex::Regex;
 
-static FIELD_TYPE: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+pub static FIELD_TYPE: Lazy<HashMap<String, String>> = Lazy::new(|| {
     let mut map = HashMap::new();
-    map.insert(r"^smallint$", "i16");
-    map.insert(r"^integer$", "i32");
-    map.insert(r"^bigint$", "i64");
-    map.insert(r"^decimal$", "Decimal");
-    map.insert(r"^numeric$", "Decimal");
-    map.insert(r"^real$", "Decimal");
-    map.insert(r"^double$", "Decimal");
-    map.insert(r"^precision$", "Decimal");
-    map.insert(r"^smallserial$", "u16");
-    map.insert(r"^serial$", "u32");
-    map.insert(r"^bigserial$", "u64");
-    map.insert(r"^money$", "Decimal");
+    map.insert(r"^smallint$".to_string(), "i16".to_string());
+    map.insert(r"^integer$".to_string(), "i32".to_string());
+    map.insert(r"^bigint$".to_string(), "i64".to_string());
+    map.insert(r"^decimal$".to_string(), "Decimal".to_string());
+    map.insert(r"^numeric$".to_string(), "Decimal".to_string());
+    map.insert(r"^real$".to_string(), "Decimal".to_string());
+    map.insert(r"^double$".to_string(), "Decimal".to_string());
+    map.insert(r"^precision$".to_string(), "Decimal".to_string());
+    map.insert(r"^smallserial$".to_string(), "u16".to_string());
+    map.insert(r"^serial$".to_string(), "u32".to_string());
+    map.insert(r"^bigserial$".to_string(), "u64".to_string());
+    map.insert(r"^money$".to_string(), "Decimal".to_string());
 
-    map.insert(r"^char$", "String");
-    map.insert(r"^char\(\d+\)$", "String");
-    map.insert(r"^varchar$", "String");
-    map.insert(r"^varchar\(\d+\)$", "String");
-    map.insert(r"^text$", "String");
-    map.insert(r"^bytea$", "Vec<u8>");
-    map.insert(r"^timestamp$", "NaiveDateTime");
-    map.insert(r"^timestamp with time zone$", "NaiveDateTime");
-    map.insert(r"^time with time zone$", "NaiveDateTime");
-    map.insert(r"^time$", "NaiveDateTime");
-    map.insert(r"^date$", "Date");
-    map.insert(r"^interval$", "String");
-    map.insert(r"^uuid$", "String");
-    map.insert(r"^xml$", "String");
-    map.insert(r"^json$", "String");
-    map.insert(r"^jsonb$", "String");
-    map.insert(r"^jsonpath$", "String");
+    map.insert(r"^char$".to_string(), "String".to_string());
+    map.insert(r"^char\(\d+\)$".to_string(), "String".to_string());
+    map.insert(r"^varchar$".to_string(), "String".to_string());
+    map.insert(r"^varchar\(\d+\)$".to_string(), "String".to_string());
+    map.insert(r"^text$".to_string(), "String".to_string());
+    map.insert(r"^bytea$".to_string(), "Vec<u8>".to_string());
+    map.insert(r"^timestamp$".to_string(), "NaiveDateTime".to_string());
+    map.insert(r"^timestamp with time zone$".to_string(), "NaiveDateTime".to_string());
+    map.insert(r"^time with time zone$".to_string(), "NaiveDateTime".to_string());
+    map.insert(r"^time$".to_string(), "NaiveDateTime".to_string());
+    map.insert(r"^date$".to_string(), "Date".to_string());
+    map.insert(r"^interval$".to_string(), "String".to_string());
+    map.insert(r"^uuid$".to_string(), "String".to_string());
+    map.insert(r"^xml$".to_string(), "String".to_string());
+    map.insert(r"^json$".to_string(), "String".to_string());
+    map.insert(r"^jsonb$".to_string(), "String".to_string());
+    map.insert(r"^jsonpath$".to_string(), "String".to_string());
     map
 });
 
@@ -74,26 +75,35 @@ impl PostgresStruct {
         Ok(Self { config, client })
     }
 
-    async fn gen_template_data(&self, gen_template_data: GenTemplateData) -> Result<Table> {
+    async fn gen_template_data(&self, gen_template_data: GenTemplateData, fields_type: &Option<HashMap<String, String>>) -> Result<Table> {
+        let default_type = FIELD_TYPE.clone();
+        let fields_type = fields_type.as_ref().unwrap_or(&default_type);
         let mut fields = vec![];
         for row in gen_template_data.sql_rows.iter() {
             let field_name: String = row.get(0);
+            let camel_name: String = field_name.to_camel_case();
+            let capitalized_camel_case = async_ok!(self.first_char_to_uppercase(&camel_name))?;
             if field_name.contains("drop") {
                 continue;
             }
-            let mut field_type: String = row.get(1);
-            field_type = async_ok!(self.get_rust_type(&field_type, FIELD_TYPE.clone()))?;
+            let database_field_type: String = row.get(1);
+            let field_type = async_ok!(self.get_field_type(&database_field_type, fields_type))?;
             let is_null: bool = row.get(2);
             let mut cur_is_null = 0;
             if is_null == false {
                 cur_is_null = 1;
             }
             let comment: Option<String> = row.get(3);
+            let default: Option<String> = row.get(4);
             let field = Field {
                 field_name,
+                FieldName: capitalized_camel_case,
+                fieldName: camel_name,
+                database_field_type,
                 field_type,
                 comment: comment.unwrap_or_default(),
                 is_null: cur_is_null,
+                default,
             };
             fields.push(field);
         }
@@ -104,6 +114,32 @@ impl PostgresStruct {
             gen_template_data.table_comment,
         );
         Ok(temp)
+    }
+
+    async fn index_key(&self, table_name: &str) -> Result<Vec<Vec<String>>> {
+        let sql = format!("SELECT indexdef FROM pg_indexes WHERE schemaname = '{}' and tablename = '{}'", self.config.schemaname.to_owned().unwrap_or_default(), table_name);
+        let rows = &self
+            .client
+            .query(
+                &sql,
+                &[],
+            )
+            .await?;
+        let mut index_list = vec![];
+        let re = Regex::new("\\(.*\\)").unwrap();
+        for row in rows {
+            let value: &str = row.get(0);
+            let data = re.find(value).unwrap();
+            let v:&[u8] = value.as_bytes().get(data.start() + 1..data.end() - 1).unwrap();
+            let v = String::from_utf8_lossy(v).to_string();
+            let v:Vec<&str> = v.split(", ").collect();
+            let mut index = vec![];
+            for v in v {
+                index.push(v.to_owned());
+            }
+            index_list.push(index);
+        }
+        Ok(index_list)
     }
 }
 
@@ -163,11 +199,28 @@ impl GenStruct for PostgresStruct {
         &self,
         tables: Vec<String>,
         table_comment_map: HashMap<String, String>,
+        fields_type: Option<HashMap<String, String>>,
     ) -> Result<Vec<Table>> {
         let mut templates = vec![];
         for table_name in tables.iter() {
-            let sql = format!("SELECT a.attname as name, format_type(a.atttypid,a.atttypmod) as type, a.attnotnull as is_null, col_description(a.attrelid,a.attnum) as comment
-FROM pg_class as c,pg_attribute as a where c.relname = '{}' and a.attrelid = c.oid and a.attnum>0", table_name);
+            let sql = format!("select a.attname                 as filed,
+        format_type(a.atttypid, a.atttypmod)                            as filed_type,
+        a.attnotnull                                                    as is_null,
+        col_description(a.attrelid, a.attnum)                           as comment,
+        pg_get_expr(d.adbin, d.adrelid)                                 as default_value
+        from pg_class c,
+        pg_attribute a
+        left join (select a.attname, ad.adbin, ad.adrelid
+                  from pg_class c,
+                       pg_attribute a,
+                       pg_attrdef ad
+                  where relname = '{}'
+                    and ad.adrelid = c.oid
+                    and adnum = a.attnum
+                    and attrelid = c.oid) as d on a.attname = d.attname
+        where c.relname = '{}'
+        and a.attrelid = c.oid
+        and a.attnum > 0", table_name, table_name);
             let rows = self.client.query(&sql, &[]).await?;
             let mut struct_name = table_name.to_camel_case();
             struct_name = self.first_char_to_uppercase(&struct_name).await?;
@@ -182,8 +235,8 @@ FROM pg_class as c,pg_attribute as a where c.relname = '{}' and a.attrelid = c.o
                 sql_rows: rows,
                 table_comment,
             };
-            let table = async_ok!(self.gen_template_data(gen_template_data))?;
-            // todo table.index_key = self.index_key(&mut conn, table_name).await?;
+            let mut table = async_ok!(self.gen_template_data(gen_template_data, &fields_type))?;
+            table.index_key = self.index_key(table_name).await?;
             templates.push(table);
         }
         Ok(templates)

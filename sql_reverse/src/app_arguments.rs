@@ -13,6 +13,8 @@ pub enum Command {
     Mysql(Sql),
     #[structopt(name = "postgres")]
     Postgres(Sql),
+    #[structopt(name = "export")]
+    Export,
 }
 
 #[derive(Debug, StructOpt)]
@@ -26,6 +28,9 @@ pub struct Sql {
     /// Input template name
     #[structopt(short = "n", default_value = "base.tera")]
     pub template_name: String,
+    /// Custom field type
+    #[structopt(short = "c", default_value = "./default.json")]
+    pub custom_field_type: String,
     /// Suffix of the generated file
     #[structopt(short = "s", default_value = "rs")]
     pub suffix: String,

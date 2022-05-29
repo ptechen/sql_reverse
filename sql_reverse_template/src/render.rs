@@ -35,7 +35,8 @@ pub trait Render {
         let mut mods = vec![];
         for table in tables {
             mods.push(format!("pub mod {};\n", table.table_name));
-            context.insert("template", table);
+            context.insert("template", table); // 兼容之前的版本
+            context.insert("table", table);
             let mut struct_str = tera.render(template_name, &context)?;
             let filepath = format!("{}/{}.{}", output_dir, table.table_name, suffix);
             let content = read_file(&filepath).unwrap_or_default();

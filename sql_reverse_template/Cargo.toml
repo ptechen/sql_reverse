@@ -1,6 +1,6 @@
 [package]
 name = "sql_reverse_template"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 homepage = "https://github.com/ptechen"
 documentation = "https://github.com/ptechen/sql_reverse/blob/main/README.md"
@@ -11,7 +11,8 @@ description = "sql reveser template"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sql_reverse_error = { version = "^0.1"}
+#sql_reverse_error = { version = "^0.1"}
+sql_reverse_error = { path = "../sql_reverse_error" }
 async-std = "1.11.0"
 async-trait = "0.1.53"
 quicli = "0.4.0"

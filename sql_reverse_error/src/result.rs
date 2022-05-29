@@ -9,6 +9,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug)]
 pub enum Error {
     SerdeYamlError(serde_yaml::Error),
+    SerdeJsonError(serde_json::Error),
     IoError(std::io::Error),
     QuiCliError(quicli::prelude::Error),
     TeraError(tera::Error),
@@ -47,6 +48,7 @@ impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match &self {
             Error::SerdeYamlError(ref error) => Some(error),
+            Error::SerdeJsonError(ref error) => Some(error),
             Error::IoError(ref error) => Some(error),
             Error::QuiCliError(ref error) => {
                 let s: CustomError = From::from(error.to_string());
@@ -68,6 +70,7 @@ impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
             Error::SerdeYamlError(ref error) => error.fmt(f),
+            Error::SerdeJsonError(ref error) => error.fmt(f),
             Error::IoError(ref error) => error.fmt(f),
             Error::QuiCliError(ref error) => error.fmt(f),
             Error::TeraError(ref error) => error.fmt(f),
@@ -118,6 +121,12 @@ impl From<quicli::prelude::Error> for Error {
 impl From<serde_yaml::Error> for Error {
     fn from(error: serde_yaml::Error) -> Error {
         Error::SerdeYamlError(error)
+    }
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(error: serde_json::Error) -> Error {
+        Error::SerdeJsonError(error)
     }
 }
 

@@ -17,16 +17,25 @@ pub struct Table {
 }
 
 /// sql 字段
+#[allow(non_snake_case)]
 #[derive(Serialize, Clone, Default, Debug)]
 pub struct Field {
-    /// 字段名
+    /// 数据库字段名
     pub field_name: String,
+    /// 首字母大写驼峰字段名
+    pub FieldName: String,
+    /// 首字母小写驼峰字段名
+    pub fieldName: String,
+    /// 字段数据库类型
+    pub database_field_type: String,
     /// 字段类型
     pub field_type: String,
     /// 注释
     pub comment: String,
     /// 默认值是否为null, 1: 是 0: 不是
     pub is_null: u8,
+    /// 默认值
+    pub default: Option<String>
 }
 
 impl Table {

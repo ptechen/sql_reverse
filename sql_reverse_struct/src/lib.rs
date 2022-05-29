@@ -5,6 +5,7 @@ pub mod common;
 pub mod gen_struct;
 pub mod mysql_struct;
 pub mod postgres_struct;
+pub mod export;
 
 #[cfg(test)]
 mod tests {

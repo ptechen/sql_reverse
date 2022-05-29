@@ -8,11 +8,21 @@ use regex::Regex;
 
 #[async_trait]
 pub trait GenStruct {
-    async fn run(&self) -> Result<Vec<Table>> {
+    async fn run(&self, filename: &str) -> Result<Vec<Table>> {
         let tables = async_ok!(self.get_tables())?;
         let table_comment_map = async_ok!(self.get_tables_comment())?;
-        let templates = async_ok!(self.gen_templates(tables, table_comment_map))?;
+        let fields_type = async_ok!(self.load_custom_fields_type(filename))?;
+        let templates = async_ok!(self.gen_templates(tables, table_comment_map, fields_type))?;
         Ok(templates)
+    }
+
+    async fn load_custom_fields_type(&self, filename: &str) -> Result<Option<HashMap<String, String>>> {
+        if filename== "./default.json" {
+            return Ok(None)
+        }
+        let s = read_file(filename)?;
+        let fields_type:HashMap<String, String> = serde_json::from_str(&s)?;
+        Ok(Some(fields_type))
     }
 
     async fn get_tables(&self) -> Result<Vec<String>>;
@@ -23,9 +33,10 @@ pub trait GenStruct {
         &self,
         tables: Vec<String>,
         table_comment_map: HashMap<String, String>,
+        fields_type: Option<HashMap<String, String>>,
     ) -> Result<Vec<Table>>;
 
-    async fn get_rust_type(&self, field_type: &str, field_type_map: HashMap<&str, &str>) -> Result<String> {
+    async fn get_field_type(&self, field_type: &str, field_type_map: &HashMap<String, String>) -> Result<String> {
         for (k, v) in field_type_map.iter() {
             let r = Regex::new(k.trim()).unwrap();
             if r.is_match(&field_type) {

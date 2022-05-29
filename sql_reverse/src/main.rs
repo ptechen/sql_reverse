@@ -10,6 +10,7 @@ use sql_reverse_template::render::Render;
 use sql_reverse_template::table::Table;
 use structopt::StructOpt;
 use tracing::Level;
+use sql_reverse_struct::export::export;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -20,7 +21,7 @@ async fn main() -> Result<()> {
         Command::Mysql(opt) => {
             let config = mysql_struct::MysqlStruct::load(&opt.file).await?;
             let mysql = MysqlStruct::new(config)?;
-            let tables = mysql.run().await?;
+            let tables = mysql.run(&opt.custom_field_type).await?;
             Table::render_rust(
                 &opt.template_path,
                 &opt.template_name,
@@ -34,7 +35,7 @@ async fn main() -> Result<()> {
         Command::Postgres(opt) => {
             let config = postgres_struct::PostgresStruct::load(&opt.file).await?;
             let postgres = PostgresStruct::new(config).await?;
-            let tables = postgres.run().await?;
+            let tables = postgres.run(&opt.custom_field_type).await?;
             Table::render_rust(
                 &opt.template_path,
                 &opt.template_name,
@@ -43,6 +44,9 @@ async fn main() -> Result<()> {
                 &tables,
             )
             .await?;
+        },
+        Command::Export => {
+            export().await?;
         }
     }
     Ok(())

@@ -10,43 +10,43 @@ use sql_reverse_error::result::Result;
 use sql_reverse_template::table::{Field, Table};
 use std::collections::HashMap;
 
-static FIELD_TYPE: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+pub static FIELD_TYPE: Lazy<HashMap<String, String>> = Lazy::new(|| {
     let mut map = HashMap::new();
-    map.insert(r"^int$", "i32");
-    map.insert(r"^int unsigned$", "u32");
-    map.insert(r"^int\(\d+\)$", "i32");
-    map.insert(r"^int\(\d+\) unsigned$", "u32");
-    map.insert(r"^integer$", "i32");
-    map.insert(r"^integer unsigned$", "u32");
-    map.insert(r"^integer\(\d+\)$", "i32");
-    map.insert(r"^integer\(\d+\) unsigned$", "u32");
-    map.insert(r"^tinyint$", "i8");
-    map.insert(r"^tinyint unsigned$", "u8");
-    map.insert(r"^tinyint\(\d+\)$", "i8");
-    map.insert(r"^tinyint\(\d+\) unsigned$", "u8");
-    map.insert(r"^smallint$", "i16");
-    map.insert(r"^smallint unsigned$", "u16");
-    map.insert(r"^smallint\(\d+\)$", "i16");
-    map.insert(r"^smallint\(\d+\) unsigned$", "u16");
-    map.insert(r"^mediumint$", "i32");
-    map.insert(r"^mediumint unsigned$", "u32");
-    map.insert(r"^mediumint\(\d+\)$", "i32");
-    map.insert(r"^mediumint\(\d+\) unsigned$", "u32");
-    map.insert(r"^bigint$", "i64");
-    map.insert(r"^bigint unsigned$", "u64");
-    map.insert(r"^bigint\(\d+\)$", "i64");
-    map.insert(r"^bigint\(\d+\) unsigned$", "u64");
-    map.insert(r"^float", "f32");
-    map.insert(r"^double", "f64");
-    map.insert(r"^decimal", "Decimal");
-    map.insert(r"^date$", "Date");
-    map.insert(r"^datetime$", "NaiveDateTime");
-    map.insert(r"^timestamp$", "NaiveDateTime");
-    map.insert(r"year", "Year");
-    map.insert(r"char", "String");
-    map.insert(r"text", "String");
-    map.insert(r"blob", "Vec<u8>");
-    map.insert(r"^json$", "String");
+    map.insert(r"^int$".to_string(), "i32".to_string());
+    map.insert(r"^int unsigned$".to_string(), "u32".to_string());
+    map.insert(r"^int\(\d+\)$".to_string(), "i32".to_string());
+    map.insert(r"^int\(\d+\) unsigned$".to_string(), "u32".to_string());
+    map.insert(r"^integer$".to_string(), "i32".to_string());
+    map.insert(r"^integer unsigned$".to_string(), "u32".to_string());
+    map.insert(r"^integer\(\d+\)$".to_string(), "i32".to_string());
+    map.insert(r"^integer\(\d+\) unsigned$".to_string(), "u32".to_string());
+    map.insert(r"^tinyint$".to_string(), "i8".to_string());
+    map.insert(r"^tinyint unsigned$".to_string(), "u8".to_string());
+    map.insert(r"^tinyint\(\d+\)$".to_string(), "i8".to_string());
+    map.insert(r"^tinyint\(\d+\) unsigned$".to_string(), "u8".to_string());
+    map.insert(r"^smallint$".to_string(), "i16".to_string());
+    map.insert(r"^smallint unsigned$".to_string(), "u16".to_string());
+    map.insert(r"^smallint\(\d+\)$".to_string(), "i16".to_string());
+    map.insert(r"^smallint\(\d+\) unsigned$".to_string(), "u16".to_string());
+    map.insert(r"^mediumint$".to_string(), "i32".to_string());
+    map.insert(r"^mediumint unsigned$".to_string(), "u32".to_string());
+    map.insert(r"^mediumint\(\d+\)$".to_string(), "i32".to_string());
+    map.insert(r"^mediumint\(\d+\) unsigned$".to_string(), "u32".to_string());
+    map.insert(r"^bigint$".to_string(), "i64".to_string());
+    map.insert(r"^bigint unsigned$".to_string(), "u64".to_string());
+    map.insert(r"^bigint\(\d+\)$".to_string(), "i64".to_string());
+    map.insert(r"^bigint\(\d+\) unsigned$".to_string(), "u64".to_string());
+    map.insert(r"^float".to_string(), "f32".to_string());
+    map.insert(r"^double".to_string(), "f64".to_string());
+    map.insert(r"^decimal".to_string(), "Decimal".to_string());
+    map.insert(r"^date$".to_string(), "Date".to_string());
+    map.insert(r"^datetime$".to_string(), "NaiveDateTime".to_string());
+    map.insert(r"^timestamp$".to_string(), "NaiveDateTime".to_string());
+    map.insert(r"year".to_string(), "Year".to_string());
+    map.insert(r"char".to_string(), "String".to_string());
+    map.insert(r"text".to_string(), "String".to_string());
+    map.insert(r"blob".to_string(), "Vec<u8>".to_string());
+    map.insert(r"^json$".to_string(), "String".to_string());
     map
 });
 
@@ -74,23 +74,32 @@ impl MysqlStruct {
         Ok(Self { config, pool })
     }
 
-    async fn gen_template_data(&self, gen_template_data: GenTemplateData) -> Result<Table> {
+    async fn gen_template_data(&self, gen_template_data: GenTemplateData, fields_type: &Option<HashMap<String, String>>) -> Result<Table> {
+        let default_type = FIELD_TYPE.clone();
+        let fields_type = fields_type.as_ref().unwrap_or(&default_type);
         let mut fields = vec![];
         for row in gen_template_data.sql_rows.iter() {
             let field_name: String = row.get(0).unwrap();
-            let mut field_type: String = row.get(1).unwrap();
-            field_type = self.get_rust_type(&field_type, FIELD_TYPE.clone()).await?;
+            let camel_name: String = field_name.to_camel_case();
+            let capitalized_camel_case = async_ok!(self.first_char_to_uppercase(&camel_name))?;
+            let database_field_type: String = row.get(1).unwrap();
+            let field_type = async_ok!(self.get_field_type(&database_field_type, fields_type))?;
             let is_null: String = row.get(3).unwrap_or_default();
             let mut cur_is_null = 0;
             if is_null == "YES" {
                 cur_is_null = 1;
             }
+            let default_value: Option<String> = row.get(5).unwrap_or(None);
             let comment: String = row.get(8).unwrap_or(String::new());
             let field = Field {
                 field_name,
+                FieldName: capitalized_camel_case,
+                fieldName: camel_name,
+                database_field_type,
                 field_type,
                 comment,
                 is_null: cur_is_null,
+                default: default_value
             };
             fields.push(field);
         }
@@ -104,7 +113,7 @@ impl MysqlStruct {
     }
 
     async fn index_key(&self, conn: &mut PooledConn, table_name: &str) -> Result<Vec<Vec<String>>> {
-        let indexs:Vec<(String, String)> = conn.query(&format!("select CONSTRAINT_NAME,COLUMN_NAME from INFORMATION_SCHEMA.KEY_COLUMN_USAGE t where t.TABLE_NAME ='{}'", table_name))?;
+        let indexs: Vec<(String, String)> = conn.query(&format!("select CONSTRAINT_NAME,COLUMN_NAME from INFORMATION_SCHEMA.KEY_COLUMN_USAGE t where t.TABLE_NAME ='{}'", table_name))?;
         let mut key = String::new();
         let mut list = vec![];
         let mut cur = vec![];
@@ -167,6 +176,7 @@ impl GenStruct for MysqlStruct {
         &self,
         tables: Vec<String>,
         table_comment_map: HashMap<String, String>,
+        fields_type: Option<HashMap<String, String>>,
     ) -> Result<Vec<Table>> {
         let mut templates = vec![];
         let mut conn = self.pool.get_conn()?;
@@ -186,7 +196,7 @@ impl GenStruct for MysqlStruct {
                 sql_rows,
                 table_comment,
             };
-            let mut table = self.gen_template_data(gen_template_data).await?;
+            let mut table = self.gen_template_data(gen_template_data, &fields_type).await?;
             table.index_key = self.index_key(&mut conn, table_name).await?;
             templates.push(table);
         }
