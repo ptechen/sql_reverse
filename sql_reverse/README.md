@@ -19,9 +19,11 @@
     -V, --version    Prints version information
     
     SUBCOMMANDS:
+    export      
     help        Prints this message or the help of the given subcommand(s)
     mysql       
     postgres
+
 
 ## sql_reverse mysql/postgres [OPTIONS]
     USAGE:

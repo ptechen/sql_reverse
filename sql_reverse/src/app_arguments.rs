@@ -9,10 +9,13 @@ pub struct ApplicationArguments {
 
 #[derive(Debug, StructOpt)]
 pub enum Command {
+    /// Mysql OPTIONS
     #[structopt(name = "mysql")]
     Mysql(Sql),
+    /// PostgresSQL OPTIONS
     #[structopt(name = "postgres")]
     Postgres(Sql),
+    /// Export default database field types
     #[structopt(name = "export")]
     Export,
 }
