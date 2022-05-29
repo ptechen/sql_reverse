@@ -22,19 +22,19 @@ pub enum Command {
 
 #[derive(Debug, StructOpt)]
 pub struct Sql {
-    /// Input config file to read
+    /// Input config file to read, example: -f ./reverse.yml
     #[structopt(short = "f", default_value = "./reverse.yml")]
     pub file: String,
-    /// Input template path
+    /// Input template path example: -p 'templates/*'
     #[structopt(short = "p", default_value = "templates/*")]
     pub template_path: String,
-    /// Input template name
+    /// Input template name, example: -n base.tera
     #[structopt(short = "n", default_value = "base.tera")]
     pub template_name: String,
-    /// Custom field type
-    #[structopt(short = "c", default_value = "./default.json")]
+    /// Custom field type, example: -c ./default.json
+    #[structopt(short = "c", default_value = "")]
     pub custom_field_type: String,
-    /// Suffix of the generated file
+    /// Suffix of the generated file, example: -s rs
     #[structopt(short = "s", default_value = "rs")]
     pub suffix: String,
 }

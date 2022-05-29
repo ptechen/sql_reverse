@@ -17,7 +17,7 @@ pub trait GenStruct {
     }
 
     async fn load_custom_fields_type(&self, filename: &str) -> Result<Option<HashMap<String, String>>> {
-        if filename== "./default.json" {
+        if filename == "" {
             return Ok(None)
         }
         let s = read_file(filename)?;
