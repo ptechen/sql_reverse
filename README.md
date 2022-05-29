@@ -102,7 +102,7 @@
         pub default: Option<String>
     }
 
-## Template:
+## Rust Template:
     use serde_derive;
     use chrono::prelude::*;
     use serde::{Deserialize, Serialize};
