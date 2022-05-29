@@ -35,11 +35,12 @@
     -V, --version    Prints version information
     
     OPTIONS:
-    -c <custom-field-type>        Custom field type [default: ./default.json]
-    -f <file>                     Input config file to read [default: ./reverse.yml]
-    -s <suffix>                   Suffix of the generated file [default: rs]
-    -n <template-name>            Input template name [default: base.tera]
-    -p <template-path>            Input template path [default: templates/*]
+    -c <custom-field-type>        Custom field type, example: -c ./default.json [default: ]
+    -f <file>                     Input config file to read, example: -f ./reverse.yml [default: ./reverse.yml]
+    -s <suffix>                   Suffix of the generated file, example: -s rs [default: rs]
+    -n <template-name>            Input template name, example: -n base.tera [default: base.tera]
+    -p <template-path>            Input template path example: -p 'templates/*' [default: templates/*]
+
 
 
 ## Exec，you need to make sure you're in the same directory as templates.
