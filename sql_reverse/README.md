@@ -64,23 +64,41 @@
     output_dir: ./dir # code output directory
 
 ## Template Struct:
-    #[derive(Serialize)]
-    pub struct Template {
+    /// sql 表
+    #[derive(Serialize, Clone, Default, Debug)]
+    pub struct Table {
+        /// 表名
         pub table_name: String,
+        /// 结构体名
         pub struct_name: String,
-        pub fields: Vec<Field>, 
+        /// 字段列表
+        pub fields: Vec<Field>,
+        /// 表注释
         pub comment: String,
+        /// 索引
+        pub index_key: Vec<Vec<String>>,
     }
-
-    #[derive(Serialize, Clone)]
+    
+    /// sql 字段
+    #[allow(non_snake_case)]
+    #[derive(Serialize, Clone, Default, Debug)]
     pub struct Field {
+        /// 数据库字段名
         pub field_name: String,
+        /// 首字母大写驼峰字段名
+        pub FieldName: String,
+        /// 首字母小写驼峰字段名
+        pub fieldName: String,
+        /// 数据库字段类型
+        pub database_field_type: String,
+        /// 字段类型
         pub field_type: String,
+        /// 注释
         pub comment: String,
-        /// only supported mysql
-        pub index_key: Vec<Vec<String>>
-        /// 1: 是, 0: 否
+        /// 默认值是否为null, 1: 是 0: 不是
         pub is_null: u8,
+        /// 默认值
+        pub default: Option<String>
     }
 
 ## Template:

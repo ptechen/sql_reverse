@@ -26,7 +26,7 @@ pub struct Field {
     pub FieldName: String,
     /// 首字母小写驼峰字段名
     pub fieldName: String,
-    /// 字段数据库类型
+    /// 数据库类型类型
     pub database_field_type: String,
     /// 字段类型
     pub field_type: String,
