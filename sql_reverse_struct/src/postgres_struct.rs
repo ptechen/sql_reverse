@@ -126,18 +126,20 @@ impl PostgresStruct {
             )
             .await?;
         let mut index_list = vec![];
-        let re = Regex::new("\\(.*\\)").unwrap();
+        let re = Regex::new("\\(.*\\)")?;
         for row in rows {
             let value: &str = row.get(0);
-            let data = re.find(value).unwrap();
-            let v:&[u8] = value.as_bytes().get(data.start() + 1..data.end() - 1).unwrap();
-            let v = String::from_utf8_lossy(v).to_string();
-            let v:Vec<&str> = v.split(", ").collect();
-            let mut index = vec![];
-            for v in v {
-                index.push(v.to_owned());
+            if re.is_match(value) {
+                let data = re.find(value).unwrap();
+                let v:&[u8] = value.as_bytes().get(data.start() + 1..data.end() - 1).unwrap();
+                let v = String::from_utf8_lossy(v).to_string();
+                let v:Vec<&str> = v.split(", ").collect();
+                let mut index = vec![];
+                for v in v {
+                    index.push(v.to_owned());
+                }
+                index_list.push(index);
             }
-            index_list.push(index);
         }
         Ok(index_list)
     }

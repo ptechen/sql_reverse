@@ -8,6 +8,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
+    RegexError(regex::Error),
     SerdeYamlError(serde_yaml::Error),
     SerdeJsonError(serde_json::Error),
     IoError(std::io::Error),
@@ -47,6 +48,7 @@ impl std::fmt::Display for CustomError {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match &self {
+            Error::RegexError(ref err) => Some(err),
             Error::SerdeYamlError(ref error) => Some(error),
             Error::SerdeJsonError(ref error) => Some(error),
             Error::IoError(ref error) => Some(error),
@@ -69,6 +71,7 @@ impl std::error::Error for Error {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
+            Error::RegexError(ref error) => error.fmt(f),
             Error::SerdeYamlError(ref error) => error.fmt(f),
             Error::SerdeJsonError(ref error) => error.fmt(f),
             Error::IoError(ref error) => error.fmt(f),
@@ -133,5 +136,11 @@ impl From<serde_json::Error> for Error {
 impl From<std::io::Error> for Error {
     fn from(s: std::io::Error) -> Self {
         Error::IoError(s)
+    }
+}
+
+impl From<regex::Error> for Error {
+    fn from(s: regex::Error) -> Self {
+        Error::RegexError(s)
     }
 }
