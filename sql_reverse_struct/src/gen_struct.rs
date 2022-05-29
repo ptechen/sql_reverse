@@ -43,6 +43,7 @@ pub trait GenStruct {
                 return Ok(v.to_string());
             }
         }
+        println!("The '{}' field type not matched", field_type);
         Ok(String::new())
     }
 
