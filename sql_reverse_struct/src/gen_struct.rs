@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use quicli::prelude::read_file;
 use sql_reverse_error::result::Result;
 use sql_reverse_template::table::Table;
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
 use regex::Regex;
 
 #[async_trait]
@@ -16,12 +16,12 @@ pub trait GenStruct {
         Ok(templates)
     }
 
-    async fn load_custom_fields_type(&self, filename: &str) -> Result<Option<HashMap<String, String>>> {
+    async fn load_custom_fields_type(&self, filename: &str) -> Result<Option<BTreeMap<String, String>>> {
         if filename == "" {
             return Ok(None)
         }
         let s = read_file(filename)?;
-        let fields_type:HashMap<String, String> = serde_json::from_str(&s)?;
+        let fields_type:BTreeMap<String, String> = serde_json::from_str(&s)?;
         Ok(Some(fields_type))
     }
 
@@ -33,10 +33,10 @@ pub trait GenStruct {
         &self,
         tables: Vec<String>,
         table_comment_map: HashMap<String, String>,
-        fields_type: Option<HashMap<String, String>>,
+        fields_type: Option<BTreeMap<String, String>>,
     ) -> Result<Vec<Table>>;
 
-    async fn get_field_type(&self, field_type: &str, field_type_map: &HashMap<String, String>) -> Result<String> {
+    async fn get_field_type(&self, field_type: &str, field_type_map: &BTreeMap<String, String>) -> Result<String> {
         for (k, v) in field_type_map.iter() {
             let r = Regex::new(k.trim()).unwrap();
             if r.is_match(&field_type) {

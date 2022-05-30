@@ -5,12 +5,12 @@ use inflector::Inflector;
 use once_cell::sync::Lazy;
 use sql_reverse_error::result::Result;
 use sql_reverse_template::table::{Field, Table};
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
 use tokio_postgres::{Client, NoTls, Row};
 use regex::Regex;
 
-pub static FIELD_TYPE: Lazy<HashMap<String, String>> = Lazy::new(|| {
-    let mut map = HashMap::new();
+pub static FIELD_TYPE: Lazy<BTreeMap<String, String>> = Lazy::new(|| {
+    let mut map = BTreeMap::new();
     map.insert(r"^smallint$".to_string(), "i16".to_string());
     map.insert(r"^integer$".to_string(), "i32".to_string());
     map.insert(r"^bigint$".to_string(), "i64".to_string());
@@ -75,7 +75,7 @@ impl PostgresStruct {
         Ok(Self { config, client })
     }
 
-    async fn gen_template_data(&self, gen_template_data: GenTemplateData, fields_type: &Option<HashMap<String, String>>) -> Result<Table> {
+    async fn gen_template_data(&self, gen_template_data: GenTemplateData, fields_type: &Option<BTreeMap<String, String>>) -> Result<Table> {
         let default_type = FIELD_TYPE.clone();
         let fields_type = fields_type.as_ref().unwrap_or(&default_type);
         let mut fields = vec![];
@@ -201,7 +201,7 @@ impl GenStruct for PostgresStruct {
         &self,
         tables: Vec<String>,
         table_comment_map: HashMap<String, String>,
-        fields_type: Option<HashMap<String, String>>,
+        fields_type: Option<BTreeMap<String, String>>,
     ) -> Result<Vec<Table>> {
         let mut templates = vec![];
         for table_name in tables.iter() {

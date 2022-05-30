@@ -8,10 +8,10 @@ use mysql::*;
 use once_cell::sync::Lazy;
 use sql_reverse_error::result::Result;
 use sql_reverse_template::table::{Field, Table};
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
 
-pub static FIELD_TYPE: Lazy<HashMap<String, String>> = Lazy::new(|| {
-    let mut map = HashMap::new();
+pub static FIELD_TYPE: Lazy<BTreeMap<String, String>> = Lazy::new(|| {
+    let mut map = BTreeMap::new();
     map.insert(r"^int$".to_string(), "i32".to_string());
     map.insert(r"^int unsigned$".to_string(), "u32".to_string());
     map.insert(r"^int\(\d+\)$".to_string(), "i32".to_string());
@@ -74,7 +74,7 @@ impl MysqlStruct {
         Ok(Self { config, pool })
     }
 
-    async fn gen_template_data(&self, gen_template_data: GenTemplateData, fields_type: &Option<HashMap<String, String>>) -> Result<Table> {
+    async fn gen_template_data(&self, gen_template_data: GenTemplateData, fields_type: &Option<BTreeMap<String, String>>) -> Result<Table> {
         let default_type = FIELD_TYPE.clone();
         let fields_type = fields_type.as_ref().unwrap_or(&default_type);
         let mut fields = vec![];
@@ -176,7 +176,7 @@ impl GenStruct for MysqlStruct {
         &self,
         tables: Vec<String>,
         table_comment_map: HashMap<String, String>,
-        fields_type: Option<HashMap<String, String>>,
+        fields_type: Option<BTreeMap<String, String>>,
     ) -> Result<Vec<Table>> {
         let mut templates = vec![];
         let mut conn = self.pool.get_conn()?;
