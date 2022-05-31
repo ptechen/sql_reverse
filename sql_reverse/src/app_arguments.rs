@@ -22,7 +22,7 @@ pub enum Command {
 
 #[derive(Debug, StructOpt)]
 pub struct Sql {
-    /// Input config file to read, example: -f ./reverse.yml
+    /// Input database config file to read, example: -f ./reverse.yml
     #[structopt(short = "f", default_value = "./reverse.yml")]
     pub file: String,
     /// Input template path example: -p 'templates/*'

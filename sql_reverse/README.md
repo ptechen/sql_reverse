@@ -1,6 +1,7 @@
 # sql reverse
 
-# Generate the multiple programming languages structure based on the MySQL/PostgresSQL table structure
+# 基于数据库表结构生成多种编程语言代码的命令行工具，支持 MySQL 和 PostgresSQL。
+# A command-line tool for generating code in multiple programming languages based on database table structures, supporting MySQL and PostgresSQL.
 [![Version info](https://img.shields.io/crates/v/sql_reverse.svg)](https://crates.io/crates/sql_reverse)
 [![Downloads](https://img.shields.io/crates/d/sql_reverse.svg?style=flat-square)](https://crates.io/crates/sql_reverse)
 [![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reverse)
@@ -36,7 +37,7 @@
     
     OPTIONS:
     -c <custom-field-type>        Custom field type, example: -c ./default.json [default: ]
-    -f <file>                     Input config file to read, example: -f ./reverse.yml [default: ./reverse.yml]
+    -f <file>                     Input database config file to read, example: -f ./reverse.yml [default: ./reverse.yml]
     -s <suffix>                   Suffix of the generated file, example: -s rs [default: rs]
     -n <template-name>            Input template name, example: -n base.tera [default: base.tera]
     -p <template-path>            Input template path example: -p 'templates/*' [default: templates/*]
