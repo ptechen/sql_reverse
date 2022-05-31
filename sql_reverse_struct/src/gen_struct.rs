@@ -5,6 +5,14 @@ use sql_reverse_error::result::Result;
 use sql_reverse_template::table::Table;
 use std::collections::{HashMap, BTreeMap};
 use regex::Regex;
+use std::io::{self, Write};
+use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+
+fn write_red(text: &str) -> io::Result<()> {
+    let mut stdout = StandardStream::stdout(ColorChoice::Always);
+    stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+    writeln!(&mut stdout, "{}" ,text)
+}
 
 #[async_trait]
 pub trait GenStruct {
@@ -43,7 +51,7 @@ pub trait GenStruct {
                 return Ok(v.to_string());
             }
         }
-        println!("'{}' field type does not match, default type String will be used", field_type);
+        write_red(&format!("[{}] field type does not match, default type [String] will be used", field_type))?;
         Ok(String::from("String"))
     }
 
