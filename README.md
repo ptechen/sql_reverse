@@ -103,7 +103,49 @@
         pub default: Option<String>
     }
 
-## Rust Template:
+## Rust sqlx template example:
+    use serde::{Deserialize, Serialize};
+    use sqlx::mysql::MySqlRow;
+    use sqlx::{FromRow, Row};
+    
+    {% if table.comment -%}
+    	/// {{ table.comment }}
+    {% endif -%}
+    {% for index in table.index_key -%}
+        /// 索引：{{index}}
+    {% endfor -%}
+    
+    
+    #[derive(Serialize, Deserialize, PartialEq, Clone)]
+    pub struct {{ table.struct_name }} {
+    {%- for v in table.fields %}
+    	{% if v.comment -%}
+    	    /// {{ v.comment }} {% if v.database_field_type %} field_type: {{ v.database_field_type }}{% endif %}{% if v.default %} default: {{ v.default }}{% endif %} {% if v.default == '' %} default: ''{% endif %}
+    	{% endif -%}
+    	{% if v.is_null == 1 -%}
+        	pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+        {%- else -%}
+            {% if v.field_type == 'NaiveDateTime' -%}
+                pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+            {%- else -%}
+                pub {{ v.field_name }}: {{ v.field_type }},
+            {%- endif -%}
+        {%- endif -%}
+    {%- endfor %}
+    }
+    
+    
+    impl<'c> FromRow<'c, MySqlRow<'c>> for {{ table.struct_name }} {
+        fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
+            Ok({{ table.struct_name }} {
+    {%- for v in table.fields %}
+                {{ v.field_name }}: row.get( {{ loop.index0 }} ),
+    {%- endfor %}        
+            })
+        }
+    }
+
+## Rust template example:
     use serde_derive;
     use chrono::prelude::*;
     use serde::{Deserialize, Serialize};
