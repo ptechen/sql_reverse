@@ -11,11 +11,14 @@ use tokio::fs::OpenOptions;
 use tokio::io::AsyncWriteExt;
 
 const FLAG: &'static str = "// ***************************************以下是自定义代码区域******************************************";
-const FLAG2: &'static str = "
+const FLAG2: &'static str = r#"
 /*
-[]
+example: [
+    {"skip_fields": ["updated_at", "created_at"], "filename": "article1"},
+    {"contain_fields": ["updated_at", "created_at"], "filename": "article2"}
+]
 */
-// *************************************************************************************************";
+// *************************************************************************************************"#;
 
 use crate::table::Table;
 use async_trait::async_trait;
