@@ -85,7 +85,7 @@ pub trait Render {
                     let filepath = format!("{}/{}.{}", output_dir, filter.1, suffix);
                     let content = read_file(&filepath).unwrap_or_default();
                     let vv: Vec<&str> = content.split(FLAG).collect();
-                    let mut custom = vv.get(1).unwrap_or(&"").to_string();
+                    let custom = vv.get(1).unwrap_or(&"").to_string();
                     struct_str = struct_str + "\n" + FLAG + custom.as_str();
                     async_ok!(Self::write_to_file(&filepath, &struct_str))?;
                 }
