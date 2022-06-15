@@ -56,3 +56,37 @@ impl Table {
 }
 
 impl Render for Table {}
+
+impl Table {
+    pub async fn skip_fields(&self, skip_fields: Vec<String>) -> Table {
+        let mut fields = vec![];
+        for field in self.fields.iter() {
+            if !skip_fields.contains(&field.field_name) {
+                fields.push(field.to_owned());
+            }
+        }
+        Table{
+            table_name: self.table_name.to_owned(),
+            struct_name: self.struct_name.to_owned(),
+            fields,
+            comment: self.comment.to_owned(),
+            index_key: self.index_key.to_owned(),
+        }
+    }
+
+    pub async fn contain_fields(&self, contain_fields: Vec<String>) -> Table{
+        let mut fields = vec![];
+        for field in self.fields.iter() {
+            if contain_fields.contains(&field.field_name) {
+                fields.push(field.to_owned());
+            }
+        }
+        Table{
+            table_name: self.table_name.to_owned(),
+            struct_name: self.struct_name.to_owned(),
+            fields,
+            comment: self.comment.to_owned(),
+            index_key: self.index_key.to_owned(),
+        }
+    }
+}
