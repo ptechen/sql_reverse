@@ -1,6 +1,6 @@
 [package]
 name = "sql_reverse_template"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 homepage = "https://github.com/ptechen"
 documentation = "https://github.com/ptechen/sql_reverse/blob/main/README.md"
