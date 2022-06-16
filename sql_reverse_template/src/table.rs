@@ -35,7 +35,7 @@ pub struct Field {
     /// 默认值是否为null, 1: 是 0: 不是
     pub is_null: u8,
     /// 默认值
-    pub default: Option<String>
+    pub default: Option<String>,
 }
 
 impl Table {
@@ -65,7 +65,7 @@ impl Table {
                 fields.push(field.to_owned());
             }
         }
-        Table{
+        Table {
             table_name: self.table_name.to_owned(),
             struct_name: self.struct_name.to_owned(),
             fields,
@@ -74,14 +74,14 @@ impl Table {
         }
     }
 
-    pub async fn contain_fields(&self, contain_fields: Vec<String>) -> Table{
+    pub async fn contain_fields(&self, contain_fields: Vec<String>) -> Table {
         let mut fields = vec![];
         for field in self.fields.iter() {
             if contain_fields.contains(&field.field_name) {
                 fields.push(field.to_owned());
             }
         }
-        Table{
+        Table {
             table_name: self.table_name.to_owned(),
             struct_name: self.struct_name.to_owned(),
             fields,

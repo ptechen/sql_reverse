@@ -14,8 +14,8 @@ const FLAG: &'static str = "// ***************************************以下是�
 const FLAG2: &'static str = r#"
 /*
 example: [
-    {"skip_fields": ["updated_at", "created_at"], "filename": "article1"},
-    {"contain_fields": ["updated_at", "created_at"], "filename": "article2"}
+    {"skip_fields": ["updated_at", "created_at"], "filename": "table_name1"},
+    {"contain_fields": ["updated_at", "created_at"], "filename": "table_name2"}
 ]
 */
 // *************************************************************************************************"#;
@@ -23,10 +23,10 @@ example: [
 use crate::table::Table;
 use async_trait::async_trait;
 use quicli::prelude::*;
+use serde::{Deserialize, Serialize};
 use sql_reverse_error::result::Result;
 use std::path::Path;
 use tera::{Context, Tera};
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FilterFields {
@@ -35,21 +35,23 @@ pub struct FilterFields {
     pub filename: String,
 }
 
-
 async fn filter_fields(table: &Table, params: Vec<FilterFields>) -> Result<Vec<(Table, String)>> {
     let mut list = vec![];
     for field in params.iter() {
         if field.skip_fields.is_some() {
-            let data = table.skip_fields(field.skip_fields.to_owned().unwrap()).await;
+            let data = table
+                .skip_fields(field.skip_fields.to_owned().unwrap())
+                .await;
             list.push((data, field.filename.to_owned()));
         } else if field.contain_fields.is_some() {
-            let data = table.contain_fields(field.contain_fields.to_owned().unwrap()).await;
+            let data = table
+                .contain_fields(field.contain_fields.to_owned().unwrap())
+                .await;
             list.push((data, field.filename.to_owned()));
         }
     }
     Ok(list)
 }
-
 
 #[async_trait]
 pub trait Render {
@@ -62,33 +64,27 @@ pub trait Render {
     ) -> Result<()> {
         create_dir(output_dir)?;
         let tera = Tera::new(template_path)?;
-        let mut context = Context::new();
         let mut mods = vec![];
         for table in tables {
             mods.push(format!("pub mod {};\n", table.table_name));
-            context.insert("template", table); // 兼容之前的版本
-            context.insert("table", table);
-            let mut struct_str = tera.render(template_name, &context)?;
-            let filepath = format!("{}/{}.{}", output_dir, table.table_name, suffix);
-            let content = read_file(&filepath).unwrap_or_default();
-            let vv: Vec<&str> = content.split(FLAG).collect();
-            let mut custom = vv.get(1).unwrap_or(&"").to_string();
+            let (mut struct_str, mut custom,filepath) = Self::render_table(&tera, table, template_name, suffix, output_dir, &table.table_name).await?;
             if custom != "" {
                 let data: Vec<&str> = custom.split("*/").collect();
                 let data = data.get(0).unwrap_or(&"").to_string();
                 let data = data.replace("/*", "");
                 let data = data.trim();
-                let params:Vec<FilterFields> = serde_json::from_str(&data).unwrap_or(vec![]);
+                let params: Vec<FilterFields> = serde_json::from_str(&data).unwrap_or(vec![]);
                 let filters = filter_fields(table, params).await?;
                 for filter in filters.iter() {
                     mods.push(format!("pub mod {};\n", filter.1));
-                    context.insert("template", &filter.0); // 兼容之前的版本
-                    context.insert("table", &filter.0);
-                    let mut struct_str = tera.render(template_name, &context)?;
-                    let filepath = format!("{}/{}.{}", output_dir, filter.1, suffix);
-                    let content = read_file(&filepath).unwrap_or_default();
-                    let vv: Vec<&str> = content.split(FLAG).collect();
-                    let custom = vv.get(1).unwrap_or(&"").to_string();
+                    let (mut struct_str, custom,filepath) = Self::render_table(&tera, &filter.0, template_name, suffix, output_dir, &filter.1).await?;
+                    // context.insert("template", &filter.0); // 兼容之前的版本
+                    // context.insert("table", &filter.0);
+                    // let mut struct_str = tera.render(template_name, &context)?;
+                    // let filepath = format!("{}/{}.{}", output_dir, filter.1, suffix);
+                    // let content = read_file(&filepath).unwrap_or_default();
+                    // let vv: Vec<&str> = content.split(FLAG).collect();
+                    // let custom = vv.get(1).unwrap_or(&"").to_string();
                     struct_str = struct_str + "\n" + FLAG + custom.as_str();
                     async_ok!(Self::write_to_file(&filepath, &struct_str))?;
                 }
@@ -106,6 +102,25 @@ pub trait Render {
         }
 
         Ok(())
+    }
+
+    async fn render_table(
+        tera: &Tera,
+        table: &Table,
+        template_name: &str,
+        suffix: &str,
+        output_dir: &str,
+        filename: &str
+    ) -> Result<(String, String, String)> {
+        let mut context = Context::new();
+        context.insert("template", table); // 兼容之前的版本
+        context.insert("table", table);
+        let struct_str = tera.render(template_name, &context)?;
+        let filepath = format!("{}/{}.{}", output_dir, filename, suffix);
+        let content = read_file(&filepath).unwrap_or_default();
+        let vv: Vec<&str> = content.split(FLAG).collect();
+        let custom = vv.get(1).unwrap_or(&"").to_string();
+        Ok((struct_str, custom, filepath))
     }
 
     async fn write_to_file(filepath: &str, content: &str) -> Result<()> {
