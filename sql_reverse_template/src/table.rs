@@ -61,7 +61,15 @@ impl Table {
     pub async fn skip_fields(&self, skip_fields: Vec<String>) -> Table {
         let mut fields = vec![];
         for field in self.fields.iter() {
-            if !skip_fields.contains(&field.field_name) {
+            let mut flag = true;
+            for keys in &self.index_key {
+                if keys.contains(&field.field_name) {
+                    fields.push(field.to_owned());
+                    flag = false;
+                    continue;
+                }
+            }
+            if !skip_fields.contains(&field.field_name) && flag {
                 fields.push(field.to_owned());
             }
         }
@@ -77,7 +85,15 @@ impl Table {
     pub async fn contain_fields(&self, contain_fields: Vec<String>) -> Table {
         let mut fields = vec![];
         for field in self.fields.iter() {
-            if contain_fields.contains(&field.field_name) {
+            let mut flag = true;
+            for keys in &self.index_key {
+                if keys.contains(&field.field_name) {
+                    fields.push(field.to_owned());
+                    flag = false;
+                    continue;
+                }
+            }
+            if contain_fields.contains(&field.field_name) && flag{
                 fields.push(field.to_owned());
             }
         }

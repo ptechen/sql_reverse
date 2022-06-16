@@ -35,7 +35,7 @@ pub struct FilterFields {
     pub filename: String,
 }
 
-async fn filter_fields(table: &Table, params: Vec<FilterFields>) -> Result<Vec<(Table, String)>> {
+async fn filter_fields(table: &Table, params: Vec<FilterFields>, ) -> Result<Vec<(Table, String)>> {
     let mut list = vec![];
     for field in params.iter() {
         if field.skip_fields.is_some() {
