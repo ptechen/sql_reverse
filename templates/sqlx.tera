@@ -74,13 +74,11 @@ impl {{table.struct_name}} {
     pub async fn insert(&self, http_ctx: &HttpCtx) -> AppResult<u64> {
         let mut conn = MYSQL_POOL.acquire().await?;
     	let sql = "INSERT INTO {{table.table_name}} ({% for field in table.fields -%}
-    		    {%- if loop.index != 1 -%}{{field.field_name}}{% if loop.last == false %},{% endif %}{%- endif -%}
-    		{%- endfor %}) VALUES({% for field in table.fields -%}{%- if loop.index != 1 -%}?{% if loop.last == false %},{% endif %}{%- endif -%}{%- endfor %})";
+    		    {{field.field_name}}{% if loop.last == false %},{% endif %}
+    		{%- endfor %}) VALUES({% for field in table.fields -%}?{% if loop.last == false %},{% endif %}{%- endfor %})";
     	let data = tracing_async!(http_ctx, sqlx::query(sql)
     	{%- for field in table.fields %}
-    	    {%- if loop.index != 1 %}
             .bind(&self.{{field.field_name}})
-            {%- endif -%}
         {%- endfor %}
     	    .execute(&mut conn)
             )?.last_insert_id();

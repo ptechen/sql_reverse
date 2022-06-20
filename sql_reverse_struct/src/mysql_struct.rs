@@ -112,27 +112,48 @@ impl MysqlStruct {
         Ok(temp)
     }
 
+    // async fn index_key(&self, conn: &mut PooledConn, table_name: &str) -> Result<Vec<Vec<String>>> {
+    //     let indexs: Vec<(String, String)> = conn.query(&format!("select CONSTRAINT_NAME,COLUMN_NAME from INFORMATION_SCHEMA.KEY_COLUMN_USAGE t where t.TABLE_NAME ='{}'", table_name))?;
+    //     let mut key = String::new();
+    //     let mut list = vec![];
+    //     let mut cur = vec![];
+    //     for index in indexs {
+    //         if key == "" {
+    //             key = index.0;
+    //             cur.push(index.1)
+    //         } else if key == index.0 {
+    //             key = index.0;
+    //             cur.push(index.1);
+    //         } else {
+    //             key = index.0;
+    //             list.push(cur);
+    //             cur = vec![];
+    //             cur.push(index.1);
+    //         }
+    //     }
+    //     if cur.len() > 0 {
+    //         list.push(cur);
+    //     }
+    //     Ok(list)
+    // }
     async fn index_key(&self, conn: &mut PooledConn, table_name: &str) -> Result<Vec<Vec<String>>> {
-        let indexs: Vec<(String, String)> = conn.query(&format!("select CONSTRAINT_NAME,COLUMN_NAME from INFORMATION_SCHEMA.KEY_COLUMN_USAGE t where t.TABLE_NAME ='{}'", table_name))?;
-        let mut key = String::new();
-        let mut list = vec![];
-        let mut cur = vec![];
+        let indexs:Vec<Row>  = conn.query(&format!("show index from {}", table_name))?;
+        let mut map:BTreeMap<String, Vec<String>>= BTreeMap::new();
         for index in indexs {
-            if key == "" {
-                key = index.0;
-                cur.push(index.1)
-            } else if key == index.0 {
-                key = index.0;
-                cur.push(index.1);
+            let key:String = index.get(2).unwrap();
+            let field_name:String = index.get(4).unwrap();
+            let v = map.get(&key);
+            if v.is_none() {
+                map.insert(key, vec![field_name]);
             } else {
-                key = index.0;
-                list.push(cur);
-                cur = vec![];
-                cur.push(index.1);
+                let mut v = v.unwrap().to_owned();
+                v.push(field_name);
+                map.insert(key, v);
             }
         }
-        if cur.len() > 0 {
-            list.push(cur);
+        let mut list = vec![];
+        for (_, val) in map {
+            list.push(val);
         }
         Ok(list)
     }
