@@ -66,7 +66,7 @@ pub struct GenTemplateData {
 impl MysqlStruct {
     pub fn new(config: CustomConfig) -> Result<Self> {
         let url = format!(
-            "mysql://{}@{}{}:{}/{}",
+            "mysql://{}:{}@{}:{}/{}",
             config.username, config.password, config.host, config.port, config.database
         );
         let opts = Opts::from_url(&url)?;
@@ -83,7 +83,7 @@ impl MysqlStruct {
             let camel_name: String = field_name.to_camel_case();
             let capitalized_camel_case = async_ok!(self.first_char_to_uppercase(&camel_name))?;
             let database_field_type: String = row.get(1).unwrap();
-            let field_type = async_ok!(self.get_field_type(&database_field_type, fields_type))?;
+            let field_type = async_ok!(self.get_field_type(&database_field_type, &field_name, fields_type))?;
             let is_null: String = row.get(3).unwrap_or_default();
             let mut cur_is_null = 0;
             if is_null == "YES" {

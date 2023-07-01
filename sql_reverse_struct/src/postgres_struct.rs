@@ -87,7 +87,7 @@ impl PostgresStruct {
                 continue;
             }
             let database_field_type: String = row.get(1);
-            let field_type = async_ok!(self.get_field_type(&database_field_type, fields_type))?;
+            let field_type = async_ok!(self.get_field_type(&database_field_type, &field_name, fields_type))?;
             let is_null: bool = row.get(2);
             let mut cur_is_null = 0;
             if is_null == false {

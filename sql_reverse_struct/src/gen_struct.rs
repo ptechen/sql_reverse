@@ -44,14 +44,14 @@ pub trait GenStruct {
         fields_type: Option<BTreeMap<String, String>>,
     ) -> Result<Vec<Table>>;
 
-    async fn get_field_type(&self, field_type: &str, field_type_map: &BTreeMap<String, String>) -> Result<String> {
+    async fn get_field_type(&self, field_type: &str, filed_name: &str, field_type_map: &BTreeMap<String, String>) -> Result<String> {
         for (k, v) in field_type_map.iter() {
             let r = Regex::new(k.trim()).unwrap();
             if r.is_match(&field_type) {
                 return Ok(v.to_string());
             }
         }
-        write_red(&format!("[{}] field type does not match, default type [String] will be used", field_type))?;
+        write_red(&format!("filed_name:{}, {} field type does not match, default type [String] will be used", filed_name, field_type))?;
         Ok(String::from("String"))
     }
 
