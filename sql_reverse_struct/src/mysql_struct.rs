@@ -136,26 +136,43 @@ impl MysqlStruct {
     //     }
     //     Ok(list)
     // }
-    async fn index_key(&self, conn: &mut PooledConn, table_name: &str) -> Result<Vec<Vec<String>>> {
+    async fn index_key(&self, conn: &mut PooledConn, table_name: &str) -> Result<(Vec<Vec<String>>, Vec<Vec<String>>)> {
         let indexs:Vec<Row>  = conn.query(&format!("show index from {}", table_name))?;
         let mut map:BTreeMap<String, Vec<String>>= BTreeMap::new();
+        let mut unique_map:BTreeMap<String, Vec<String>> = BTreeMap::new();
         for index in indexs {
             let key:String = index.get(2).unwrap();
+            let is_unique:i8 = index.get(1).unwrap();
             let field_name:String = index.get(4).unwrap();
-            let v = map.get(&key);
-            if v.is_none() {
-                map.insert(key, vec![field_name]);
+            if is_unique == 0 {
+                let v = unique_map.get(&key);
+                if v.is_none() {
+                    unique_map.insert(key, vec![field_name]);
+                } else {
+                    let mut v = v.unwrap().to_owned();
+                    v.push(field_name);
+                    unique_map.insert(key, v);
+                }
             } else {
-                let mut v = v.unwrap().to_owned();
-                v.push(field_name);
-                map.insert(key, v);
+                let v = map.get(&key);
+                if v.is_none() {
+                    map.insert(key, vec![field_name]);
+                } else {
+                    let mut v = v.unwrap().to_owned();
+                    v.push(field_name);
+                    map.insert(key, v);
+                }
             }
         }
         let mut list = vec![];
         for (_, val) in map {
             list.push(val);
         }
-        Ok(list)
+        let mut unique_list = vec![];
+        for (_, val) in unique_map {
+            unique_list.push(val);
+        }
+        Ok((list, unique_list))
     }
 }
 
@@ -218,7 +235,9 @@ impl GenStruct for MysqlStruct {
                 table_comment,
             };
             let mut table = self.gen_template_data(gen_template_data, &fields_type).await?;
-            table.index_key = self.index_key(&mut conn, table_name).await?;
+            let (index_key, unique_key) = self.index_key(&mut conn, table_name).await?;
+            table.index_key = index_key;
+            table.unique_key = unique_key;
             templates.push(table);
         }
         Ok(templates)
