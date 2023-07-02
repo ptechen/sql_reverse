@@ -12,8 +12,10 @@ pub struct Table {
     pub fields: Vec<Field>,
     /// 表注释
     pub comment: String,
-    /// 索引
+    /// 普通索引索引
     pub index_key: Vec<Vec<String>>,
+    /// 唯一索引
+    pub unique_key: Vec<Vec<String>>,
 }
 
 /// sql 字段
@@ -51,6 +53,7 @@ impl Table {
             fields,
             comment,
             index_key: vec![],
+            unique_key: vec![],
         }
     }
 }
@@ -79,6 +82,7 @@ impl Table {
             fields,
             comment: self.comment.to_owned(),
             index_key: self.index_key.to_owned(),
+            unique_key: self.unique_key.to_owned(),
         }
     }
 
@@ -103,6 +107,7 @@ impl Table {
             fields,
             comment: self.comment.to_owned(),
             index_key: self.index_key.to_owned(),
+            unique_key: self.unique_key.to_owned(),
         }
     }
 }
