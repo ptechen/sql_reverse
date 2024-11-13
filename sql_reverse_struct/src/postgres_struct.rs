@@ -23,7 +23,7 @@ pub static FIELD_TYPE: Lazy<BTreeMap<String, String>> = Lazy::new(|| {
     map.insert(r"^serial$".to_string(), "u32".to_string());
     map.insert(r"^bigserial$".to_string(), "u64".to_string());
     map.insert(r"^money$".to_string(), "Decimal".to_string());
-
+    map.insert(r"^boolean$".to_string(), "bool".to_string());
     map.insert(r"^char$".to_string(), "String".to_string());
     map.insert(r"^char\(\d+\)$".to_string(), "String".to_string());
     map.insert(r"^varchar$".to_string(), "String".to_string());
