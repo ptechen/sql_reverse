@@ -53,12 +53,8 @@
     sql_reverse mysql -f reverse.yml -p 'templates/*' -s rs -n base.tera -c ./mysql_default.json
     sql_reverse postgres -f reverse.yml -p 'templates/*' -s rs -n base.tera -c ./postgres_default.json
 ## reverse.yml
-    host: 127.0.0.1
-    port: 3306
-    username: root
-    password: ''
-    database: db_name
-    schemaname: test # only postgres enable
+    db_url: postgres://postgres:123456@localhost/test
+    schemaname: public # only postgres enable
     include_tables: # Include tables, can be ignored.
     #  - table_name
     exclude_tables: # Exclude, tables, can be ignored.

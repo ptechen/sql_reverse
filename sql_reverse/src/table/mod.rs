@@ -1,5 +1,10 @@
-use crate::render::Render;
+pub mod mysql;
+pub mod postgres;
+pub mod sqlite;
+
 use serde::Serialize;
+use crate::template::kit::Kit;
+use crate::template::render::Render;
 
 /// sql 表
 #[derive(Serialize, Clone, Default, Debug)]
@@ -17,6 +22,8 @@ pub struct Table {
     /// 唯一索引
     pub unique_key: Vec<Vec<String>>,
 }
+
+impl Render for Table {}
 
 /// sql 字段
 #[allow(non_snake_case)]
@@ -39,26 +46,6 @@ pub struct Field {
     /// 默认值
     pub default: Option<String>,
 }
-
-impl Table {
-    pub fn new(
-        table_name: String,
-        struct_name: String,
-        fields: Vec<Field>,
-        comment: String,
-    ) -> Table {
-        Table {
-            table_name,
-            struct_name,
-            fields,
-            comment,
-            index_key: vec![],
-            unique_key: vec![],
-        }
-    }
-}
-
-impl Render for Table {}
 
 impl Table {
     pub async fn skip_fields(&self, skip_fields: Vec<String>) -> Table {
@@ -97,7 +84,7 @@ impl Table {
                     continue;
                 }
             }
-            if contain_fields.contains(&field.field_name) && flag{
+            if contain_fields.contains(&field.field_name) && flag {
                 fields.push(field.to_owned());
             }
         }
@@ -111,3 +98,5 @@ impl Table {
         }
     }
 }
+
+impl Kit for Field {}

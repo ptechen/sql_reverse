@@ -1,9 +1,5 @@
-username: test
-password: ''
-host: 127.0.0.1
-port: 5432
-database: kb
-schemaname: test # only postgres enable
+db_url: 'postgres://postgres:123456@localhost/test'
+schemaname: 'public' # only postgres enable
 include_tables: # Include tables, can be ignored.
 #  - table_name
 exclude_tables: # Exclude, tables, can be ignored.

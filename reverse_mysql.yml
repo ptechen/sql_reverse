@@ -1,8 +1,5 @@
-username: root
-password: ''
-host: 127.0.0.1
-port: 3306
-database: blog
+db_url: mysql://root:z2fSJMIsTT@192.168.5.206:32135/gate
+schemaname: public
 include_tables: # Include tables, can be ignored.
 #  - table_name
 exclude_tables: # Exclude, tables, can be ignored.

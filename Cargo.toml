@@ -1,2 +1,3 @@
 [workspace]
-members = ["sql_reverse", "sql_reverse_struct", "sql_reverse_template", "sql_reverse_error"]
+members = ["sql_reverse"]
+resolver = "3"

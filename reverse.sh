@@ -1,4 +1,4 @@
-./target/debug/sql_reverse mysql -f reverse_mysql.yml -s .go
+./target/debug/sql_reverse mysql -f reverse_mysql.yml
 
 #sql_reverse postgres
 

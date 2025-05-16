@@ -1,26 +1,28 @@
 use app_arguments::{ApplicationArguments, Command};
 mod app_arguments;
-use sql_reverse_error::result::Result;
-use sql_reverse_struct::gen_struct::GenStruct;
-use sql_reverse_struct::mysql_struct;
-use sql_reverse_struct::mysql_struct::MysqlStruct;
-use sql_reverse_struct::postgres_struct;
-use sql_reverse_struct::postgres_struct::PostgresStruct;
-use sql_reverse_template::render::Render;
-use sql_reverse_template::table::Table;
+mod error;
+mod reverse_struct;
+mod template;
+mod table;
+
+use crate::error::result::Result;
+use crate::reverse_struct::export::export;
+use crate::reverse_struct::gen_struct::GenStruct;
+use crate::reverse_struct::mysql_impl::MysqlStruct;
+use crate::reverse_struct::postgres_impl::PostgresStruct;
+use crate::template::kit::Kit;
+use crate::template::render::Render;
 use structopt::StructOpt;
-use tracing::Level;
-use sql_reverse_struct::export::export;
+use crate::table::Table;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::fmt().with_max_level(Level::INFO).init();
     let args = ApplicationArguments::from_args();
     let key = args.command;
     match key {
         Command::Mysql(opt) => {
-            let config = mysql_struct::MysqlStruct::load(&opt.file).await?;
-            let mysql = MysqlStruct::new(config)?;
+            let config = MysqlStruct::load(&opt.file).await?;
+            let mysql = MysqlStruct::init(config).await?;
             let tables = mysql.run(&opt.custom_field_type).await?;
             Table::render_rust(
                 &opt.template_path,
@@ -33,7 +35,7 @@ async fn main() -> Result<()> {
         }
 
         Command::Postgres(opt) => {
-            let config = postgres_struct::PostgresStruct::load(&opt.file).await?;
+            let config = PostgresStruct::load(&opt.file).await?;
             let postgres = PostgresStruct::new(config).await?;
             let tables = postgres.run(&opt.custom_field_type).await?;
             Table::render_rust(
@@ -44,7 +46,7 @@ async fn main() -> Result<()> {
                 &tables,
             )
             .await?;
-        },
+        }
         Command::Export => {
             export().await?;
         }
