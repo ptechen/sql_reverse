@@ -14,6 +14,11 @@ use fn_macro::btreemap;
 pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> =
     LazyLock::new(|| RwLock::new(btreemap!(
         r"^integer$".to_string() => "i64".to_string(),
+        r"^TEXT$".to_string() => "String".to_string(),
+        r"^BLOB$".to_string() => "Vec<u8>".to_string(),
+        r"^ANY$".to_string() => "serde_json::Value".to_string(),
+        r"^REAL$".to_string() => "f64".to_string(),
+        r"^INT$".to_string() => "i32".to_string(),
     )));
 pub struct SqliteImpl {
     pub config: CustomConfig,
@@ -60,7 +65,6 @@ impl GenStruct for SqliteImpl {
                 .bind(&table.table_name)
                 .fetch_one(&mut *pool)
                 .await?;
-            println!("{:?}", fields);
             let mut struct_name = table.table_name.clone().to_camel_case();
             struct_name = Self::first_char_to_uppercase(&struct_name);
             let mut table = Table {
@@ -73,7 +77,7 @@ impl GenStruct for SqliteImpl {
             };
             let (index_key, unique_key) = self.index_key(&table.table_name).await?;
             table.index_key = index_key;
-            table.unique_key = unique_key;
+            table.unique_key.extend(unique_key);
             templates.push(table);
         }
         Ok(templates)

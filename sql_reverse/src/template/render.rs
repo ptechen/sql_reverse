@@ -51,7 +51,6 @@ pub trait Render {
         tables: &Vec<Table>,
     ) -> Result<()> {
         let _ = create_dir(output_dir).await;
-        println!("开始生成{}文件...", output_dir);
         let tera = Tera::new(template_path)?;
         let mut mods = vec![];
         for table in tables {
@@ -111,11 +110,10 @@ pub trait Render {
         filename: &str,
     ) -> Result<(String, String, String)> {
         let mut context = Context::new();
-        context.insert("template", table); // 兼容之前的版本
         context.insert("table", table);
         let struct_str = tera.render(template_name, &context)?;
         let filepath = format!("{}/{}.{}", output_dir, filename, suffix);
-        let content = tokio::fs::read_to_string(&filepath).await?;
+        let content = tokio::fs::read_to_string(&filepath).await.unwrap_or_default();
         let vv: Vec<&str> = content.split(FLAG).collect();
         let custom = vv.get(1).unwrap_or(&"").to_string();
         Ok((struct_str, custom, filepath))
@@ -134,7 +132,7 @@ pub trait Render {
     }
 
     async fn append_to_file(mods: Vec<String>, filepath: &str) -> Result<()> {
-        let file_content = tokio::fs::read_to_string(filepath).await?;
+        let file_content = tokio::fs::read_to_string(filepath).await.unwrap_or_default();
         for v in mods.iter() {
             if !file_content.contains(v) {
                 let mut file =

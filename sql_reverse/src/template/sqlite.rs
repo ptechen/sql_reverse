@@ -1,8 +1,12 @@
+use std::sync::{LazyLock, RwLock};
+
+pub static SQLIT_TEMPLATE: LazyLock<RwLock<&str>> = LazyLock::new(|| {
+    RwLock::new(r#"
 /*
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use error::AppResult as Result;
-use crate::mysql_pool::MYSQL_POOL;
+use error::Result;
+use crate::sqlite_pool::SQLITE_POOL;
 
 pub const TABLE_NAME: &'static str = "{{table.table_name}}";
 
@@ -193,3 +197,5 @@ impl {{table.struct_name}} {
 {%- endfor -%}
 }
 */
+    "#)
+});

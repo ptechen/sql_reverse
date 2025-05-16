@@ -1,3 +1,7 @@
+use std::sync::{LazyLock, RwLock};
+
+pub static MYSQL_TEMPLATE: LazyLock<RwLock<&str>> = LazyLock::new(|| {
+    RwLock::new(r#"
 /*
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -193,3 +197,5 @@ impl {{table.struct_name}} {
 {%- endfor -%}
 }
 */
+    "#)
+});

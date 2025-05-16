@@ -1,6 +1,5 @@
 use inflector::Inflector;
 use sqlx::{FromRow, Row};
-use sqlx::mysql::MySqlRow;
 use sqlx::postgres::PgRow;
 use crate::reverse_struct::postgres_impl;
 use crate::table::{Field, Table2Comment};
