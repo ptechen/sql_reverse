@@ -2,9 +2,17 @@ pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use crate::template::kit::Kit;
 use crate::template::render::Render;
+
+#[derive(Debug, Clone, Deserialize, Serialize, FromRow)]
+pub struct Table2Comment {
+    pub table_name: String,
+    pub table_comment: Option<String>,
+    pub is_key: bool
+}
 
 /// sql 表
 #[derive(Serialize, Clone, Default, Debug)]

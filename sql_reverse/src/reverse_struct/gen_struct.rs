@@ -1,14 +1,7 @@
 use crate::error::result::Result;
-use crate::table::Table;
-use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use crate::table::{Table, Table2Comment};
 use std::collections::BTreeMap;
 
-#[derive(Debug, Clone, Deserialize, Serialize, FromRow)]
-pub struct Table2Comment {
-    pub table_name: String,
-    pub table_comment: Option<String>,
-}
 
 pub trait GenStruct {
     async fn run(&self, filename: &str) -> Result<Vec<Table>> {

@@ -1,15 +1,16 @@
+use crate::error::result::Result;
+use crate::reverse_struct::common::CustomConfig;
+use crate::reverse_struct::gen_struct::GenStruct;
+use crate::table::sqlite::Fields;
+use crate::table::{Table, Table2Comment};
+use crate::template::kit::Kit;
+use inflector::Inflector;
+use regex::Regex;
+use sqlx::Row;
 use std::collections::BTreeMap;
 use std::sync::{LazyLock, RwLock};
-use inflector::Inflector;
-use crate::reverse_struct::common::CustomConfig;
-use crate::error::result::Result;
-use crate::reverse_struct::gen_struct::{GenStruct, Table2Comment};
-use crate::table::sqlite::Fields;
-use crate::template::kit::Kit;
-use crate::table::Table;
-pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> = LazyLock::new(|| {
-   RwLock::new(BTreeMap::new()) 
-});
+pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> =
+    LazyLock::new(|| RwLock::new(BTreeMap::new()));
 pub struct SqliteImpl {
     pub config: CustomConfig,
     pub pool: sqlx::SqlitePool,
@@ -22,10 +23,10 @@ impl SqliteImpl {
     }
 }
 
-const TABLES_SQL:&str = "select name as table_name from sqlite_master where type='table'";
-const FIELD_SQL:&str = "select sql from sqlite_master where type='table' and name = ?";
+const TABLES_SQL: &str = "select name as table_name from sqlite_master where type='table'";
+const FIELD_SQL: &str = "select sql from sqlite_master where type='table' and name = ?";
 
-const TABLE_INDEX:&str = "select sql from sqlite_master where type='index' and name = ?";
+const INDEX_SQL: &str = "select sql from sqlite_master where type='index' and name = ?";
 impl GenStruct for SqliteImpl {
     async fn get_tables(&self) -> Result<Vec<Table2Comment>> {
         let mut pool = self.pool.acquire().await?;
@@ -37,7 +38,7 @@ impl GenStruct for SqliteImpl {
             &self.config.include_tables,
             &self.config.exclude_tables,
         )
-            .await;
+        .await;
         Ok(tables)
     }
 
@@ -63,7 +64,7 @@ impl GenStruct for SqliteImpl {
                 fields: fields.fields,
                 comment: table.table_comment.unwrap_or_default(),
                 index_key: vec![],
-                unique_key: vec![],
+                unique_key: vec![fields.keys],
             };
             let (index_key, unique_key) = self.index_key(&table.table_name).await?;
             table.index_key = index_key;
@@ -74,6 +75,31 @@ impl GenStruct for SqliteImpl {
     }
 
     async fn index_key(&self, table_name: &str) -> Result<(Vec<Vec<String>>, Vec<Vec<String>>)> {
-        todo!()
+        let rows = sqlx::query(INDEX_SQL)
+            .bind(table_name)
+            .fetch_all(&self.pool)
+            .await?;
+        let mut index_list = vec![];
+        let mut unique_list = vec![];
+        let re = Regex::new("\\(.*\\)")?;
+        for row in rows {
+            let sql: &str = row.get(0);
+            if re.is_match(sql) {
+                if let Some(data) = re.find(sql) {
+                    let index: Vec<String> = data
+                        .as_str()
+                        .split(",")
+                        .into_iter()
+                        .map(|a| a.to_string())
+                        .collect();
+                    if sql.contains("unique") {
+                        unique_list.push(index);
+                    } else {
+                        index_list.push(index);
+                    }
+                }
+            }
+        }
+        Ok((index_list, unique_list))
     }
 }

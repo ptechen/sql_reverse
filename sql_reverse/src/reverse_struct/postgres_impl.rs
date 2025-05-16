@@ -1,13 +1,13 @@
 use crate::error::result::Result;
 use crate::reverse_struct::common::CustomConfig;
-use crate::reverse_struct::gen_struct::{GenStruct, Table2Comment};
+use crate::reverse_struct::gen_struct::{GenStruct};
 use crate::template::kit::Kit;
 use inflector::Inflector;
 use regex::Regex;
 use sqlx::Row;
 use std::collections::BTreeMap;
 use std::sync::{LazyLock, RwLock};
-use crate::table::{Field, Table};
+use crate::table::{Field, Table, Table2Comment};
 
 pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> = LazyLock::new(|| {
     let mut map = BTreeMap::new();
@@ -93,6 +93,7 @@ where c.relname = $2
   and a.attrelid = c.oid
   and a.attnum > 0";
 
+const INDEX_SQL:&str = "SELECT indexdef FROM pg_indexes WHERE schemaname = ? and tablename = ?";
 impl GenStruct for PostgresStruct {
     async fn get_tables(&self) -> Result<Vec<Table2Comment>> {
         let mut pool = self.pool.acquire().await?;
@@ -143,12 +144,10 @@ impl GenStruct for PostgresStruct {
         Ok(templates)
     }
     async fn index_key(&self, table_name: &str) -> Result<(Vec<Vec<String>>, Vec<Vec<String>>)> {
-        let sql = format!(
-            "SELECT indexdef FROM pg_indexes WHERE schemaname = '{}' and tablename = '{}'",
-            self.config.schemaname.to_owned().unwrap_or_default(),
-            table_name
-        );
-        let rows = sqlx::query(&sql).fetch_all(&self.pool).await?;
+        let rows = sqlx::query(INDEX_SQL)
+            .bind(self.config.schemaname.to_owned().unwrap_or_default())
+            .bind(table_name)
+            .fetch_all(&self.pool).await?;
         let mut index_list = vec![];
         let re = Regex::new("\\(.*\\)")?;
         for row in rows {

@@ -1,8 +1,8 @@
 use crate::error::result::Result;
 use crate::reverse_struct::common::CustomConfig;
-use crate::reverse_struct::gen_struct::{GenStruct, Table2Comment};
+use crate::reverse_struct::gen_struct::{GenStruct};
 use crate::template::kit::Kit;
-use crate::table::{Field, Table};
+use crate::table::{Field, Table, Table2Comment};
 use fn_macro::{btreemap, if_else};
 use inflector::Inflector;
 use sqlx::Row;
