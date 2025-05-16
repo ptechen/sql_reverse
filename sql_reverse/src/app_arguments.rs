@@ -15,6 +15,9 @@ pub enum Command {
     /// PostgresSQL OPTIONS
     #[structopt(name = "postgres")]
     Postgres(Sql),
+    /// Sqlite OPTIONS
+    #[structopt(name = "sqlite")]
+    Sqlite(Sql),
     /// Export default database field types
     #[structopt(name = "export")]
     Export,

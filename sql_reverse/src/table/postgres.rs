@@ -1,8 +1,9 @@
 use inflector::Inflector;
 use sqlx::{FromRow, Row};
+use sqlx::mysql::MySqlRow;
 use sqlx::postgres::PgRow;
 use crate::reverse_struct::postgres_impl;
-use crate::table::Field;
+use crate::table::{Field, Table2Comment};
 use crate::template::kit::Kit;
 
 impl FromRow<'_, PgRow> for Field {
@@ -25,6 +26,18 @@ impl FromRow<'_, PgRow> for Field {
             comment,
             is_null: is_null as u8,
             default,
+        })
+    }
+}
+
+impl FromRow<'_, PgRow> for Table2Comment {
+    fn from_row(row: &PgRow) -> Result<Self, sqlx::Error> {
+        let table_name = row.try_get("table_name")?;
+        let table_comment= row.try_get("table_comment")?;
+        Ok(Table2Comment {
+            table_name,
+            table_comment,
+            is_key: false,
         })
     }
 }

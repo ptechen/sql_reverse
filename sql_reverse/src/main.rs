@@ -13,6 +13,7 @@ use crate::reverse_struct::postgres_impl::PostgresStruct;
 use crate::template::kit::Kit;
 use crate::template::render::Render;
 use structopt::StructOpt;
+use crate::reverse_struct::sqlite_impl::SqliteImpl;
 use crate::table::Table;
 
 #[tokio::main]
@@ -36,7 +37,7 @@ async fn main() -> Result<()> {
 
         Command::Postgres(opt) => {
             let config = PostgresStruct::load(&opt.file).await?;
-            let postgres = PostgresStruct::new(config).await?;
+            let postgres = PostgresStruct::init(config).await?;
             let tables = postgres.run(&opt.custom_field_type).await?;
             Table::render_rust(
                 &opt.template_path,
@@ -46,6 +47,19 @@ async fn main() -> Result<()> {
                 &tables,
             )
             .await?;
+        }
+        Command::Sqlite(opt) => {
+            let config = SqliteImpl::load(&opt.file).await?;
+            let sqlite = SqliteImpl::init(config).await?;
+            let tables = sqlite.run(&opt.custom_field_type).await?;
+            Table::render_rust(
+                &opt.template_path,
+                &opt.template_name,
+                &opt.suffix,
+                &sqlite.config.output_dir,
+                &tables,
+            )
+                .await?;
         }
         Command::Export => {
             export().await?;

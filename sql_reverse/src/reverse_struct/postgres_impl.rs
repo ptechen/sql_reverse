@@ -59,7 +59,7 @@ pub struct PostgresStruct {
 impl Kit for PostgresStruct {}
 
 impl PostgresStruct {
-    pub async fn new(config: CustomConfig) -> Result<Self> {
+    pub async fn init(config: CustomConfig) -> Result<Self> {
         let pool = sqlx::PgPool::connect(&config.db_url).await?;
         Ok(Self { config, pool })
     }

@@ -9,8 +9,12 @@ use regex::Regex;
 use sqlx::Row;
 use std::collections::BTreeMap;
 use std::sync::{LazyLock, RwLock};
+use fn_macro::btreemap;
+
 pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> =
-    LazyLock::new(|| RwLock::new(BTreeMap::new()));
+    LazyLock::new(|| RwLock::new(btreemap!(
+        r"^integer$".to_string() => "i64".to_string(),
+    )));
 pub struct SqliteImpl {
     pub config: CustomConfig,
     pub pool: sqlx::SqlitePool,
@@ -56,6 +60,7 @@ impl GenStruct for SqliteImpl {
                 .bind(&table.table_name)
                 .fetch_one(&mut *pool)
                 .await?;
+            println!("{:?}", fields);
             let mut struct_name = table.table_name.clone().to_camel_case();
             struct_name = Self::first_char_to_uppercase(&struct_name);
             let mut table = Table {

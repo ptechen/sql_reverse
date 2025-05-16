@@ -3,11 +3,10 @@ pub mod postgres;
 pub mod sqlite;
 
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
 use crate::template::kit::Kit;
 use crate::template::render::Render;
 
-#[derive(Debug, Clone, Deserialize, Serialize, FromRow)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Table2Comment {
     pub table_name: String,
     pub table_comment: Option<String>,

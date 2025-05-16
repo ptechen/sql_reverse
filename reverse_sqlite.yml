@@ -1,0 +1,6 @@
+db_url: test1.db
+include_tables: # Include tables, can be ignored.
+#  - table_name
+exclude_tables: # Exclude, tables, can be ignored.
+#  - table_name
+output_dir: ./dir # code output directory

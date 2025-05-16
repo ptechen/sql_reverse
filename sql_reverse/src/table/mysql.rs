@@ -2,7 +2,7 @@ use inflector::Inflector;
 use sqlx::{FromRow, Row};
 use sqlx::mysql::MySqlRow;
 use crate::reverse_struct::mysql_impl;
-use crate::table::Field;
+use crate::table::{Field, Table2Comment};
 use crate::template::kit::Kit;
 
 impl FromRow<'_, MySqlRow> for Field {
@@ -25,6 +25,18 @@ impl FromRow<'_, MySqlRow> for Field {
             comment,
             is_null: is_null as u8,
             default,
+        })
+    }
+}
+
+impl FromRow<'_, MySqlRow> for Table2Comment {
+    fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
+        let table_name = row.try_get("table_name")?;
+        let table_comment= row.try_get("table_comment")?;
+        Ok(Table2Comment {
+            table_name,
+            table_comment,
+            is_key: false,
         })
     }
 }
