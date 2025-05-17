@@ -13,7 +13,7 @@ pub async fn export() -> Result<()> {
         .create(true)
         .truncate(true)
         .write(true)
-        .open("./mysql_default.json")
+        .open("./default_mysql.json")
         .await?;
     fs.write_all(mysql_default.replace(",\n}", "\n}").as_bytes())
         .await?;
@@ -21,7 +21,7 @@ pub async fn export() -> Result<()> {
         .create(true)
         .truncate(true)
         .write(true)
-        .open("./postgres_default.json")
+        .open("./default_postgres.json")
         .await?;
     fs.write_all(postgres_default.replace(",\n}", "\n}").as_bytes())
         .await?;
@@ -30,7 +30,7 @@ pub async fn export() -> Result<()> {
         .create(true)
         .truncate(true)
         .write(true)
-        .open("./sqlite_default.json")
+        .open("./default_sqlite.json")
         .await?;
     fs.write_all(sqlite_default.replace(",\n}", "\n}").as_bytes())
         .await?;

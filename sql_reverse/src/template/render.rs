@@ -174,6 +174,22 @@ pub trait Render {
     }
 
     async fn append_to_file(mods: Vec<String>, filepath: &str) -> Result<()> {
+
+            if let Ok(mut fs) = tokio::fs::File::options().create_new(true).write(true).open(filepath).await{
+            fs.write_all(r#"
+//pub static MYSQL_POOL:std::sync::LazyLock<sqlx::mysql::MySqlPool> = std::sync::LazyLock::new(|| {
+//    sqlx::mysql::MySqlPool::connect_lazy("mysql://root:123456@127.0.0.1:3306/test").expect("connect mysql error")
+//});
+
+//pub static POSTGRES_POOL:std::sync::LazyLock<sqlx::postgres::PgPool> = std::sync::LazyLock::new(|| {
+//    sqlx::postgres::PgPool::connect_lazy("postgres://postgres:123456@127.0.0.1:5432/test").expect("connect postgres error")
+//});
+
+//pub static SQLITE_POOL:std::sync::LazyLock<sqlx::sqlite::SqlitePool> = std::sync::LazyLock::new(|| {
+//    sqlx::sqlite::SqlitePool::connect_lazy("test.db??mode=rwc").expect("connect sqlite error")
+//});
+"#.as_bytes()).await?;
+        }
         let file_content = tokio::fs::read_to_string(filepath)
             .await
             .unwrap_or_default();

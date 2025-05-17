@@ -12,40 +12,40 @@ use std::sync::{LazyLock, RwLock};
 pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> = LazyLock::new(|| {
     let mut map = BTreeMap::new();
     map.insert(r"^smallint$".to_string(), "i16".to_string());
-    // map.insert(r"^integer$".to_string(), "i32".to_string());
-    // map.insert(r"^bigint$".to_string(), "i64".to_string());
-    // map.insert(r"^decimal$".to_string(), "Decimal".to_string());
-    // map.insert(r"^numeric$".to_string(), "Decimal".to_string());
-    // map.insert(r"^real$".to_string(), "Decimal".to_string());
-    // map.insert(r"^double$".to_string(), "Decimal".to_string());
-    // map.insert(r"^precision$".to_string(), "Decimal".to_string());
-    // map.insert(r"^smallserial$".to_string(), "u16".to_string());
-    // map.insert(r"^serial$".to_string(), "u32".to_string());
-    // map.insert(r"^bigserial$".to_string(), "u64".to_string());
-    // map.insert(r"^money$".to_string(), "Decimal".to_string());
-    // map.insert(r"^char$".to_string(), "String".to_string());
-    // map.insert(r"^char\(\d+\)$".to_string(), "String".to_string());
-    // map.insert(r"^varchar$".to_string(), "String".to_string());
-    // map.insert(r"^varchar\(\d+\)$".to_string(), "String".to_string());
-    // map.insert(r"^text$".to_string(), "String".to_string());
-    // map.insert(r"^bytea$".to_string(), "Vec<u8>".to_string());
-    // map.insert(r"^timestamp$".to_string(), "NaiveDateTime".to_string());
-    // map.insert(
-    //     r"^timestamp with time zone$".to_string(),
-    //     "NaiveDateTime".to_string(),
-    // );
-    // map.insert(
-    //     r"^time with time zone$".to_string(),
-    //     "NaiveDateTime".to_string(),
-    // );
-    // map.insert(r"^time$".to_string(), "NaiveDateTime".to_string());
-    // map.insert(r"^date$".to_string(), "Date".to_string());
-    // map.insert(r"^interval$".to_string(), "String".to_string());
-    // map.insert(r"^uuid$".to_string(), "String".to_string());
-    // map.insert(r"^xml$".to_string(), "String".to_string());
-    // map.insert(r"^json$".to_string(), "String".to_string());
-    // map.insert(r"^jsonb$".to_string(), "String".to_string());
-    // map.insert(r"^jsonpath$".to_string(), "String".to_string());
+    map.insert(r"^integer$".to_string(), "i32".to_string());
+    map.insert(r"^bigint$".to_string(), "i64".to_string());
+    map.insert(r"^decimal$".to_string(), "Decimal".to_string());
+    map.insert(r"^numeric$".to_string(), "Decimal".to_string());
+    map.insert(r"^real$".to_string(), "Decimal".to_string());
+    map.insert(r"^double$".to_string(), "Decimal".to_string());
+    map.insert(r"^precision$".to_string(), "Decimal".to_string());
+    map.insert(r"^smallserial$".to_string(), "u16".to_string());
+    map.insert(r"^serial$".to_string(), "u32".to_string());
+    map.insert(r"^bigserial$".to_string(), "u64".to_string());
+    map.insert(r"^money$".to_string(), "Decimal".to_string());
+    map.insert(r"^char$".to_string(), "String".to_string());
+    map.insert(r"^char\(\d+\)$".to_string(), "String".to_string());
+    map.insert(r"^varchar$".to_string(), "String".to_string());
+    map.insert(r"^varchar\(\d+\)$".to_string(), "String".to_string());
+    map.insert(r"^text$".to_string(), "String".to_string());
+    map.insert(r"^bytea$".to_string(), "Vec<u8>".to_string());
+    map.insert(r"^timestamp$".to_string(), "NaiveDateTime".to_string());
+    map.insert(
+        r"^timestamp with time zone$".to_string(),
+        "NaiveDateTime".to_string(),
+    );
+    map.insert(
+        r"^time with time zone$".to_string(),
+        "NaiveDateTime".to_string(),
+    );
+    map.insert(r"^time$".to_string(), "NaiveDateTime".to_string());
+    map.insert(r"^date$".to_string(), "Date".to_string());
+    map.insert(r"^interval$".to_string(), "String".to_string());
+    map.insert(r"^uuid$".to_string(), "String".to_string());
+    map.insert(r"^xml$".to_string(), "String".to_string());
+    map.insert(r"^json$".to_string(), "String".to_string());
+    map.insert(r"^jsonb$".to_string(), "String".to_string());
+    map.insert(r"^jsonpath$".to_string(), "String".to_string());
     RwLock::new(map)
 });
 
