@@ -2,15 +2,15 @@ pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
 
-use serde::{Deserialize, Serialize};
 use crate::template::kit::Kit;
 use crate::template::render::Render;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Table2Comment {
     pub table_name: String,
     pub table_comment: Option<String>,
-    pub is_key: bool
+    pub is_key: bool,
 }
 
 /// sql 表

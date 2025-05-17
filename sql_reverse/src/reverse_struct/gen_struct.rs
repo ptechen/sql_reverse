@@ -1,7 +1,6 @@
-use crate::error::result::Result;
+use crate::error::Result;
 use crate::table::{Table, Table2Comment};
 use std::collections::BTreeMap;
-
 
 pub trait GenStruct {
     async fn run(&self, filename: &str) -> Result<Vec<Table>> {
@@ -16,7 +15,7 @@ pub trait GenStruct {
         &self,
         filename: &str,
     ) -> Result<Option<BTreeMap<String, String>>> {
-        if filename == "" {
+        if filename.is_empty() {
             return Ok(None);
         }
         let s = tokio::fs::read_to_string(filename).await?;

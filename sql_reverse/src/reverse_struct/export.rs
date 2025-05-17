@@ -1,4 +1,4 @@
-use crate::error::result::Result;
+use crate::error::Result;
 use crate::reverse_struct::{mysql_impl, postgres_impl};
 use tokio::io::AsyncWriteExt;
 

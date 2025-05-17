@@ -11,6 +11,11 @@ pub const FIELDS: &str = "{%- for field in table.fields -%}{{field.field_name}}{
 {% if table.comment -%}
 	/// {{ table.comment }}
 {% endif -%}
+
+{% for index in table.unique_key -%}
+    /// Unique：{{index}}
+{% endfor -%}
+
 {% for index in table.index_key -%}
     /// Indexes：{{index}}
 {% endfor -%}
@@ -79,7 +84,7 @@ impl {{table.struct_name}} {
     /*
     pub async fn select_optional_by {%- for index in indexes -%}
                         _{{index}}
-    {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Option<Self>>{
+    {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%}{%- if loop.last == false -%},{%- endif -%}{%- endfor -%})->Result<Option<Self>>{
         let sql = format!("SELECT {} from {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
         let mut pool = MYSQL_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)

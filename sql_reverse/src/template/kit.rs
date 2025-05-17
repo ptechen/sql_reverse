@@ -1,4 +1,4 @@
-use crate::error::result::Result;
+use crate::error::Result;
 use crate::reverse_struct::common::CustomConfig;
 use regex::Regex;
 use std::collections::BTreeMap;
@@ -10,8 +10,7 @@ pub trait Kit {
     fn first_char_to_uppercase(params: &str) -> String {
         let mut v: Vec<char> = params.chars().collect();
         v[0] = v[0].to_uppercase().nth(0).unwrap();
-        let res = v.into_iter().collect();
-        res
+        v.into_iter().collect()
     }
 
     fn get_field_type(
@@ -21,7 +20,7 @@ pub trait Kit {
     ) -> Result<String> {
         for (k, v) in field_type_map.iter() {
             let r = Regex::new(k.trim())?;
-            if r.is_match(&field_type) {
+            if r.is_match(field_type) {
                 return Ok(v.to_string());
             }
         }

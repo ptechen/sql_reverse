@@ -1,18 +1,18 @@
-use crate::error::result::Result;
+use crate::error::Result;
 use crate::reverse_struct::common::CustomConfig;
 use crate::reverse_struct::gen_struct::GenStruct;
 use crate::table::sqlite::Fields;
 use crate::table::{Table, Table2Comment};
 use crate::template::kit::Kit;
+use fn_macro::btreemap;
 use inflector::Inflector;
 use regex::Regex;
 use sqlx::Row;
 use std::collections::BTreeMap;
 use std::sync::{LazyLock, RwLock};
-use fn_macro::btreemap;
 
-pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> =
-    LazyLock::new(|| RwLock::new(btreemap!(
+pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> = LazyLock::new(|| {
+    RwLock::new(btreemap!(
         r"^INTEGER$".to_string() => "i64".to_string(),
         r"^integer$".to_string() => "i64".to_string(),
         r"^TEXT$".to_string() => "String".to_string(),
@@ -25,7 +25,8 @@ pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> =
         r"^VARCHAR".to_string() => "String".to_string(),
         r"^TIMESTAMP".to_string() => "chrono::NaiveDateTime".to_string(),
 
-    )));
+    ))
+});
 pub struct SqliteImpl {
     pub config: CustomConfig,
     pub pool: sqlx::SqlitePool,
@@ -104,12 +105,8 @@ impl GenStruct for SqliteImpl {
             let sql: &str = row.get(0);
             if re.is_match(sql) {
                 if let Some(data) = re.find(sql) {
-                    let index: Vec<String> = data
-                        .as_str()
-                        .split(",")
-                        .into_iter()
-                        .map(|a| a.to_string())
-                        .collect();
+                    let index: Vec<String> =
+                        data.as_str().split(",").map(|a| a.to_string()).collect();
                     if sql.contains("unique") {
                         unique_list.push(index);
                     } else {

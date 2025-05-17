@@ -1,20 +1,24 @@
 use std::sync::{LazyLock, RwLock};
 
 pub static MYSQL_TEMPLATE: LazyLock<RwLock<&str>> = LazyLock::new(|| {
-    RwLock::new(r#"
+    RwLock::new(
+        r#"
 /*
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use error::AppResult as Result;
-use crate::mysql_pool::MYSQL_POOL;
+use super::mysql_pool::MYSQL_POOL;
 
-pub const TABLE_NAME: &'static str = "{{table.table_name}}";
+pub const TABLE_NAME: &str = "{{table.table_name}}";
 
-pub const FIELDS: &'static str = "{%- for field in table.fields -%}{{field.field_name}}{%- if loop.last == false -%},{%- endif -%}{%- endfor -%}";
+pub const FIELDS: &str = "{%- for field in table.fields -%}{{field.field_name}}{%- if loop.last == false -%},{%- endif -%}{%- endfor -%}";
 
 {% if table.comment -%}
 	/// {{ table.comment }}
 {% endif -%}
+{% for index in table.unique_key -%}
+    /// Unique：{{index}}
+{% endfor -%}
 {% for index in table.index_key -%}
     /// Indexes：{{index}}
 {% endfor -%}
@@ -197,5 +201,6 @@ impl {{table.struct_name}} {
 {%- endfor -%}
 }
 */
-    "#)
+    "#,
+    )
 });
