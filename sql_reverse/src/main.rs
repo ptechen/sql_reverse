@@ -66,7 +66,6 @@ async fn main() -> Result<()> {
                 TemplateType::Sqlite,
             )
             .await?;
-            println!("{:?}", opt);
             Table::render_rust(
                 &opt.template_path,
                 &opt.template_name,
