@@ -40,7 +40,6 @@ impl FromRow<'_, PgRow> for Table2Comment {
         Ok(Table2Comment {
             table_name,
             table_comment,
-            is_key: false,
         })
     }
 }

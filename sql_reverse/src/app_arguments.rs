@@ -12,7 +12,7 @@ pub enum Command {
     /// Mysql OPTIONS
     #[structopt(name = "mysql")]
     Mysql(Mysql),
-    /// PostgresSQL OPTIONS
+    /// Postgres OPTIONS
     #[structopt(name = "postgres")]
     Postgres(Postgres),
     /// Sqlite OPTIONS

@@ -82,13 +82,12 @@ impl {{table.struct_name}} {
     }
     */
 
-
 {% for indexes in table.unique_key %}
     /*
     pub async fn select_optional_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Option<Self>>{
-        let sql = format!("SELECT {} from {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ${{loop.index}} AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
+        let sql = format!("SELECT {} from {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ${{loop.index}} {% else %} {{index}} = ${{loop.index}} AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
         let mut pool = POSTGRES_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)
             {% for index in indexes -%}
@@ -100,7 +99,6 @@ impl {{table.struct_name}} {
     }
     */
 {% endfor -%}
-
 
 {% for indexes in table.unique_key %}
     /*
@@ -120,7 +118,6 @@ impl {{table.struct_name}} {
     */
 {% endfor -%}
 
-
 {% for indexes in table.index_key %}
    /*
     pub async fn select_many_by{%- for index in indexes -%}
@@ -139,7 +136,6 @@ impl {{table.struct_name}} {
     */
 {% endfor -%}
 
-
 {% for indexes in table.index_key %}
    /*
     pub async fn select_all_by{%- for index in indexes -%}
@@ -157,7 +153,6 @@ impl {{table.struct_name}} {
     }
     */
 {% endfor -%}
-
 
 {%- for v in table.fields -%}
     {%- if v.field_name == 'is_deleted' -%}
@@ -178,7 +173,6 @@ impl {{table.struct_name}} {
     }
     */
 {% endfor -%}
-
 
 {% for indexes in table.index_key %}
    /*

@@ -82,7 +82,6 @@ impl {{table.struct_name}} {
     }
     */
 
-
 {% for indexes in table.unique_key %}
     /*
     pub async fn select_optional_by {%- for index in indexes -%}
@@ -100,7 +99,6 @@ impl {{table.struct_name}} {
     }
     */
 {% endfor -%}
-
 
 {% for indexes in table.unique_key %}
     /*
@@ -120,7 +118,6 @@ impl {{table.struct_name}} {
     */
 {% endfor -%}
 
-
 {% for indexes in table.index_key %}
    /*
     pub async fn select_many_by{%- for index in indexes -%}
@@ -139,7 +136,6 @@ impl {{table.struct_name}} {
     */
 {% endfor -%}
 
-
 {% for indexes in table.index_key %}
    /*
     pub async fn select_all_by{%- for index in indexes -%}
@@ -157,7 +153,6 @@ impl {{table.struct_name}} {
     }
     */
 {% endfor -%}
-
 
 {%- for v in table.fields -%}
     {%- if v.field_name == 'is_deleted' -%}
@@ -178,7 +173,6 @@ impl {{table.struct_name}} {
     }
     */
 {% endfor -%}
-
 
 {% for indexes in table.index_key %}
    /*

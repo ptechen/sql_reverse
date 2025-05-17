@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 pub struct Table2Comment {
     pub table_name: String,
     pub table_comment: Option<String>,
-    pub is_key: bool,
 }
 
 /// sql 表

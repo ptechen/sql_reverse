@@ -25,7 +25,7 @@ pub trait Kit {
             }
         }
         Self::write_red(&format!(
-            "field_name:{}, {} field type does not match, default type [String] will be used",
+            "field_name:{}, {} field type does not match, default type <String> will be used",
             field_name, field_type
         ))?;
         Ok(String::from("String"))

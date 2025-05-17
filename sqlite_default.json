@@ -1,0 +1,13 @@
+{
+    "^ANY$": "serde_json::Value",
+    "^BLOB$": "Vec<u8>",
+    "^BOOLEAN$": "bool",
+    "^INT$": "i32",
+    "^INTEGER$": "i64",
+    "^REAL$": "f64",
+    "^TEXT$": "String",
+    "^TIMESTAMP": "chrono::NaiveDateTime",
+    "^VARCHAR": "String",
+    "^bool$": "bool",
+    "^integer$": "i64"
+}

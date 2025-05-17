@@ -1,4 +1,4 @@
-./target/debug/sql_reverse sqlite -f reverse_sqlite.yml
+./target/debug/sql_reverse postgres -f reverse_postgres.yml
 
 #sql_reverse postgres
 

@@ -1,0 +1,7 @@
+db_url: postgres://postgres:123456@127.0.0.1:5432/postgres
+schemaname: public
+include_tables: # Include tables, can be ignored.
+#  - table_name
+exclude_tables: # Exclude, tables, can be ignored.
+#  - table_name
+output_dir: ./dir # code output directory

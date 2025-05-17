@@ -83,7 +83,6 @@ impl FromRow<'_, SqliteRow> for Table2Comment {
         Ok(Table2Comment {
             table_name,
             table_comment: None,
-            is_key: false,
         })
     }
 }
