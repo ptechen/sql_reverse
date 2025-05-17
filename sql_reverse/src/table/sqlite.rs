@@ -15,16 +15,26 @@ pub struct Fields {
 impl Kit for Fields {}
 impl Fields {
     pub fn parse_sql(sql: &str) -> Self {
-        let items:Vec<&str> = sql.split("(").last().unwrap().split(")").next().unwrap().split(",").collect();
+        let items:Vec<String> = sql.split(",").map(|s| s.trim().to_string()).collect();
         let mut fields = vec![];
         let mut keys = vec![];
         let re = Regex::new(r"\s*(\w+)\s+(\w+)\s*").unwrap();
-        for item in items {
-            if re.is_match(item) {
-                let data=  re.captures(item).unwrap();
+        let length = items.len();
+        for (idx, mut item) in items.into_iter().enumerate() {
+            if idx == 0 {
+                item =  item.split_once("(").unwrap().1.replace("\n","");
+            } else if idx == length - 1 {
+                item = item.rsplit_once(")").unwrap().0.replace("\n","");
+            }
+            let item = item.replace("`", "").replace("\"", "");
+            if re.is_match(&item){
+                let data=  re.captures(&item).unwrap();
                 let mut data = data.iter();
                 data.next();
                 let field_name = data.next().unwrap().unwrap().as_str();
+                if field_name.contains("PRIMARY") {
+                    continue;
+                }
                 let database_field_type = data.next().unwrap().unwrap().as_str();
                 let field_name_camel_case = field_name.to_camel_case();
                 let first_char_uppercase_field_name = Self::first_char_to_uppercase(&field_name_camel_case);

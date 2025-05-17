@@ -4,9 +4,9 @@ use sqlx::FromRow;
 use error::AppResult as Result;
 use crate::mysql_pool::MYSQL_POOL;
 
-pub const TABLE_NAME: &'static str = "{{table.table_name}}";
+pub const TABLE_NAME: &str = "{{table.table_name}}";
 
-pub const FIELDS: &'static str = "{%- for field in table.fields -%}{{field.field_name}}{%- if loop.last == false -%},{%- endif -%}{%- endfor -%}";
+pub const FIELDS: &str = "{%- for field in table.fields -%}{{field.field_name}}{%- if loop.last == false -%},{%- endif -%}{%- endfor -%}";
 
 {% if table.comment -%}
 	/// {{ table.comment }}

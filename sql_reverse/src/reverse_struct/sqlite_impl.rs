@@ -13,12 +13,18 @@ use fn_macro::btreemap;
 
 pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> =
     LazyLock::new(|| RwLock::new(btreemap!(
+        r"^INTEGER$".to_string() => "i64".to_string(),
         r"^integer$".to_string() => "i64".to_string(),
         r"^TEXT$".to_string() => "String".to_string(),
         r"^BLOB$".to_string() => "Vec<u8>".to_string(),
         r"^ANY$".to_string() => "serde_json::Value".to_string(),
         r"^REAL$".to_string() => "f64".to_string(),
         r"^INT$".to_string() => "i32".to_string(),
+        r"^bool$".to_string() => "bool".to_string(),
+        r"^BOOLEAN$".to_string() => "bool".to_string(),
+        r"^VARCHAR".to_string() => "String".to_string(),
+        r"^TIMESTAMP".to_string() => "chrono::NaiveDateTime".to_string(),
+
     )));
 pub struct SqliteImpl {
     pub config: CustomConfig,
@@ -73,8 +79,11 @@ impl GenStruct for SqliteImpl {
                 fields: fields.fields,
                 comment: table.table_comment.unwrap_or_default(),
                 index_key: vec![],
-                unique_key: vec![fields.keys],
+                unique_key: vec![],
             };
+            if !fields.keys.is_empty() {
+                table.unique_key.push(fields.keys);
+            }
             let (index_key, unique_key) = self.index_key(&table.table_name).await?;
             table.index_key = index_key;
             table.unique_key.extend(unique_key);
