@@ -1,6 +1,6 @@
 # sql reverse
 
-# 基于数据库表结构自定义模版生成多种编程语言代码的命令行工具，支持 MySQL 和 PostgresSQL。
+# 基于数据库表结构自定义模版生成多种编程语言代码的命令行工具，支持 MySQL、PostgresSQL、Sqlite。
 # A command-line tool that generates codes in multiple programming languages based on custom templates of database table structures, supporting MySQL and PostgresSQL.
 [![Version info](https://img.shields.io/crates/v/sql_reverse.svg)](https://crates.io/crates/sql_reverse)
 [![Downloads](https://img.shields.io/crates/d/sql_reverse.svg?style=flat-square)](https://crates.io/crates/sql_reverse)
