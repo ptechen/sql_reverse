@@ -7,7 +7,7 @@ pub static POSTGRES_TEMPLATE: LazyLock<RwLock<&str>> = LazyLock::new(|| {
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use error::Result;
-use crate::POSTGRES_POOL;
+use super::POSTGRES_POOL;
 
 pub const TABLE_NAME: &str = "{{table.table_name}}";
 

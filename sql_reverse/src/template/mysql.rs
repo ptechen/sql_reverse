@@ -7,7 +7,7 @@ pub static MYSQL_TEMPLATE: LazyLock<RwLock<&str>> = LazyLock::new(|| {
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use error::AppResult as Result;
-use crate::MYSQL_POOL;
+use super::MYSQL_POOL;
 
 pub const TABLE_NAME: &str = "{{table.table_name}}";
 

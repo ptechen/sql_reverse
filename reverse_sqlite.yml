@@ -2,5 +2,5 @@ db_url: data.db
 include_tables: # Include tables, can be ignored.
 #  - table_name
 exclude_tables: # Exclude, tables, can be ignored.
-#  - table_name
+  - __diesel_schema_migrations
 output_dir: ./dir # code output directory

@@ -19,6 +19,7 @@ use crate::template::sqlite::SQLITE_TEMPLATE;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tera::{Context, Tera};
+use crate::template::template_type::{TemplateType, TEMPLATE_TYPE};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FilterFields {
@@ -27,11 +28,7 @@ pub struct FilterFields {
     pub filename: String,
 }
 
-pub enum TemplateType {
-    Mysql,
-    Sqlite,
-    Postgres,
-}
+
 
 async fn filter_fields(table: &Table, params: Vec<FilterFields>) -> Result<Vec<(Table, String)>> {
     let mut list = vec![];
@@ -55,7 +52,6 @@ pub trait Render {
     async fn check_download_tera(
         template_path: &str,
         template_name: &str,
-        template_type: TemplateType,
     ) -> Result<()> {
         let file = format!("{}{}", template_path.replace("*", ""), template_name);
         let _ = tokio::fs::create_dir(template_path.replace("*", "")).await;
@@ -66,7 +62,7 @@ pub trait Render {
                 .write(true)
                 .open(&file)
                 .await?;
-            match template_type {
+            match *TEMPLATE_TYPE.read().unwrap() {
                 TemplateType::Mysql => {
                     let data = MYSQL_TEMPLATE.read().unwrap().as_bytes();
                     fs.write_all(data).await?;
@@ -174,21 +170,8 @@ pub trait Render {
     }
 
     async fn append_to_file(mods: Vec<String>, filepath: &str) -> Result<()> {
-
-            if let Ok(mut fs) = tokio::fs::File::options().create_new(true).write(true).open(filepath).await{
-            fs.write_all(r#"
-//pub static MYSQL_POOL:std::sync::LazyLock<sqlx::mysql::MySqlPool> = std::sync::LazyLock::new(|| {
-//    sqlx::mysql::MySqlPool::connect_lazy("mysql://root:123456@127.0.0.1:3306/test").expect("connect mysql error")
-//});
-
-//pub static POSTGRES_POOL:std::sync::LazyLock<sqlx::postgres::PgPool> = std::sync::LazyLock::new(|| {
-//    sqlx::postgres::PgPool::connect_lazy("postgres://postgres:123456@127.0.0.1:5432/test").expect("connect postgres error")
-//});
-
-//pub static SQLITE_POOL:std::sync::LazyLock<sqlx::sqlite::SqlitePool> = std::sync::LazyLock::new(|| {
-//    sqlx::sqlite::SqlitePool::connect_lazy("test.db??mode=rwc").expect("connect sqlite error")
-//});
-"#.as_bytes()).await?;
+        if let Ok(mut fs) = tokio::fs::File::options().create_new(true).write(true).open(filepath).await{
+            fs.write_all(TEMPLATE_TYPE.read().unwrap().to_string().as_bytes()).await?;
         }
         let file_content = tokio::fs::read_to_string(filepath)
             .await

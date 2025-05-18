@@ -13,8 +13,9 @@ use crate::reverse_struct::postgres_impl::PostgresStruct;
 use crate::reverse_struct::sqlite_impl::SqliteImpl;
 use crate::table::Table;
 use crate::template::kit::Kit;
-use crate::template::render::{Render, TemplateType};
+use crate::template::render::{Render};
 use structopt::StructOpt;
+use crate::template::template_type::{update_template_type, TemplateType};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -22,10 +23,11 @@ async fn main() -> Result<()> {
     let key = args.command;
     match key {
         Command::Mysql(opt) => {
+            update_template_type(TemplateType::Mysql);
             let config = MysqlStruct::load(&opt.file).await?;
             let mysql = MysqlStruct::init(config).await?;
             let tables = mysql.run(&opt.custom_field_type).await?;
-            Table::check_download_tera(&opt.template_path, &opt.template_name, TemplateType::Mysql)
+            Table::check_download_tera(&opt.template_path, &opt.template_name)
                 .await?;
             Table::render_rust(
                 &opt.template_path,
@@ -38,13 +40,13 @@ async fn main() -> Result<()> {
         }
 
         Command::Postgres(opt) => {
+            update_template_type(TemplateType::Postgres);
             let config = PostgresStruct::load(&opt.file).await?;
             let postgres = PostgresStruct::init(config).await?;
             let tables = postgres.run(&opt.custom_field_type).await?;
             Table::check_download_tera(
                 &opt.template_path,
                 &opt.template_name,
-                TemplateType::Postgres,
             )
             .await?;
             Table::render_rust(
@@ -57,13 +59,13 @@ async fn main() -> Result<()> {
             .await?;
         }
         Command::Sqlite(opt) => {
+            update_template_type(TemplateType::Sqlite);
             let config = SqliteImpl::load(&opt.file).await?;
             let sqlite = SqliteImpl::init(config).await?;
             let tables = sqlite.run(&opt.custom_field_type).await?;
             Table::check_download_tera(
                 &opt.template_path,
                 &opt.template_name,
-                TemplateType::Sqlite,
             )
             .await?;
             Table::render_rust(
