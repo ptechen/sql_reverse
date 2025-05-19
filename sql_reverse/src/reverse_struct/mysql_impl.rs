@@ -69,7 +69,7 @@ impl MysqlImpl {
         Ok(Self { config, pool })
     }
 }
-const FIELD_SQL:&str = "SELECT CAST(COLUMN_NAME as CHAR ) as field_name, CAST(DATA_TYPE as CHAR ) as field_type, case when CAST(IS_NULLABLE as CHAR) = 'NO' THEN 0 else 1 END as is_null,
+const FIELD_SQL:&str = "SELECT CAST(COLUMN_NAME as CHAR ) as field_name, CAST(COLUMN_TYPE as CHAR ) as field_type, case when CAST(IS_NULLABLE as CHAR) = 'NO' THEN 0 else 1 END as is_null,
        CAST(COLUMN_COMMENT as CHAR ) as comment, CAST(COLUMN_DEFAULT as CHAR ) as default_value
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE table_schema = DATABASE() AND table_name = ?";

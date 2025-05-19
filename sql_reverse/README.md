@@ -11,7 +11,7 @@
     cargo install sql_reverse
 
 ## sql_reverse <SUBCOMMAND>
-    classify 0.1.14
+    classify 0.1.16
     
     USAGE:
         sql_reverse <SUBCOMMAND>

@@ -13,12 +13,14 @@ impl FromRow<'_, MySqlRow> for Field {
         let is_null: i64 = row.try_get("is_null").unwrap_or_default();
         let field_name_camel_case = field_name.clone().to_camel_case();
         let first_char_uppercase_field_name = Self::first_char_to_uppercase(&field_name_camel_case);
+
         let field_type = Self::get_field_type(
             &database_field_type,
             &field_name,
             &mysql_impl::FIELD_TYPE.read().unwrap(),
         )
         .unwrap_or_default();
+        println!("field_name: {} field_type: {} database_field_type: {}", field_name, field_type, database_field_type);
         let default = row.try_get("default_value").ok();
         Ok(Field {
             field_name,
