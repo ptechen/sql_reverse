@@ -1,7 +1,7 @@
 # sql reverse
 
 # 基于数据库表结构自定义模版生成多种编程语言代码的命令行工具，支持 MySQL、Postgres、Sqlite。
-# A command-line tool that generates codes in multiple programming languages based on custom templates of database table structures, supporting MySQL\Postgres\Sqlite.
+# A command-line tool that generates codes in multiple programming languages based on custom templates of database table structures, supporting MySQL、Postgres、Sqlite.
 [![Version info](https://img.shields.io/crates/v/sql_reverse.svg)](https://crates.io/crates/sql_reverse)
 [![Downloads](https://img.shields.io/crates/d/sql_reverse.svg?style=flat-square)](https://crates.io/crates/sql_reverse)
 [![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reverse)
@@ -11,7 +11,7 @@
     cargo install sql_reverse
 
 ## sql_reverse <SUBCOMMAND>
-    classify 0.1.13
+    classify 0.1.14
     
     USAGE:
         sql_reverse <SUBCOMMAND>
@@ -102,48 +102,6 @@
         pub is_null: u8,
         /// 默认值
         pub default: Option<String>
-    }
-
-## Rust sqlx template example:
-    use serde::{Deserialize, Serialize};
-    use sqlx::mysql::MySqlRow;
-    use sqlx::{FromRow, Row};
-    
-    {% if table.comment -%}
-    	/// {{ table.comment }}
-    {% endif -%}
-    {% for index in table.index_key -%}
-        /// 索引：{{index}}
-    {% endfor -%}
-    
-    
-    #[derive(Serialize, Deserialize, PartialEq, Clone)]
-    pub struct {{ table.struct_name }} {
-    {%- for v in table.fields %}
-    	{% if v.comment -%}
-    	    /// {{ v.comment }} {% if v.database_field_type %} field_type: {{ v.database_field_type }}{% endif %}{% if v.default %} default: {{ v.default }}{% endif %} {% if v.default == '' %} default: ''{% endif %}
-    	{% endif -%}
-    	{% if v.is_null == 1 -%}
-        	pub {{ v.field_name }}: Option<{{ v.field_type }}>,
-        {%- else -%}
-            {% if v.field_type == 'NaiveDateTime' -%}
-                pub {{ v.field_name }}: Option<{{ v.field_type }}>,
-            {%- else -%}
-                pub {{ v.field_name }}: {{ v.field_type }},
-            {%- endif -%}
-        {%- endif -%}
-    {%- endfor %}
-    }
-    
-    
-    impl<'c> FromRow<'c, MySqlRow<'c>> for {{ table.struct_name }} {
-        fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
-            Ok({{ table.struct_name }} {
-    {%- for v in table.fields %}
-                {{ v.field_name }}: row.get( {{ loop.index0 }} ),
-    {%- endfor %}        
-            })
-        }
     }
 
 ## Rust template example:

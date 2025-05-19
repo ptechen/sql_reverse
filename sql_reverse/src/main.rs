@@ -8,8 +8,8 @@ mod template;
 use crate::error::Result;
 use crate::reverse_struct::export::export;
 use crate::reverse_struct::gen_struct::GenStruct;
-use crate::reverse_struct::mysql_impl::MysqlStruct;
-use crate::reverse_struct::postgres_impl::PostgresStruct;
+use crate::reverse_struct::mysql_impl::MysqlImpl;
+use crate::reverse_struct::postgres_impl::PostgresImpl;
 use crate::reverse_struct::sqlite_impl::SqliteImpl;
 use crate::table::Table;
 use crate::template::kit::Kit;
@@ -24,8 +24,8 @@ async fn main() -> Result<()> {
     match key {
         Command::Mysql(opt) => {
             update_template_type(TemplateType::Mysql);
-            let config = MysqlStruct::load(&opt.file).await?;
-            let mysql = MysqlStruct::init(config).await?;
+            let config = MysqlImpl::load(&opt.file).await?;
+            let mysql = MysqlImpl::init(config).await?;
             let tables = mysql.run(&opt.custom_field_type).await?;
             Table::check_download_tera(&opt.template_path, &opt.template_name)
                 .await?;
@@ -41,8 +41,8 @@ async fn main() -> Result<()> {
 
         Command::Postgres(opt) => {
             update_template_type(TemplateType::Postgres);
-            let config = PostgresStruct::load(&opt.file).await?;
-            let postgres = PostgresStruct::init(config).await?;
+            let config = PostgresImpl::load(&opt.file).await?;
+            let postgres = PostgresImpl::init(config).await?;
             let tables = postgres.run(&opt.custom_field_type).await?;
             Table::check_download_tera(
                 &opt.template_path,

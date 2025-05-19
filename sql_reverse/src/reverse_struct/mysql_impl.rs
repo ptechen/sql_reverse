@@ -56,14 +56,14 @@ pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> = LazyLock::ne
 });
 
 #[derive(Debug, Clone)]
-pub struct MysqlStruct {
+pub struct MysqlImpl {
     pub config: CustomConfig,
     pub pool: sqlx::MySqlPool,
 }
 
-impl Kit for MysqlStruct {}
+impl Kit for MysqlImpl {}
 
-impl MysqlStruct {
+impl MysqlImpl {
     pub async fn init(config: CustomConfig) -> Result<Self> {
         let pool = sqlx::MySqlPool::connect(&config.db_url).await?;
         Ok(Self { config, pool })
@@ -75,7 +75,7 @@ FROM INFORMATION_SCHEMA.COLUMNS
 WHERE table_schema = DATABASE() AND table_name = ?";
 const TABLES_SQL: &str = "SELECT CAST(TABLE_NAME AS CHAR) as table_name, CAST(TABLE_COMMENT as CHAR) as table_comment FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE()";
 
-impl GenStruct for MysqlStruct {
+impl GenStruct for MysqlImpl {
     async fn get_tables(&self) -> Result<Vec<Table2Comment>> {
         let mut pool = self.pool.acquire().await?;
         let mut tables = sqlx::query_as::<_, Table2Comment>(TABLES_SQL)
@@ -131,9 +131,9 @@ impl GenStruct for MysqlStruct {
         for index in indexes {
             let key = String::from_utf8(index.get(2))?;
             let i: i8 = index.get(1);
-            let is_unique = if_else!(i == 1, 0, 1);
+            let is_unique = if_else!(i == 0, 1, 0);
             let field_name = String::from_utf8(index.get(4))?;
-            if is_unique == 0 {
+            if is_unique == 1 {
                 let v = unique_map.get(&key);
                 if v.is_none() {
                     unique_map.insert(key, vec![field_name]);

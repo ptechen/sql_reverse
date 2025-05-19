@@ -50,14 +50,14 @@ pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> = LazyLock::ne
 });
 
 #[derive(Debug)]
-pub struct PostgresStruct {
+pub struct PostgresImpl {
     pub config: CustomConfig,
     pub pool: sqlx::PgPool,
 }
 
-impl Kit for PostgresStruct {}
+impl Kit for PostgresImpl {}
 
-impl PostgresStruct {
+impl PostgresImpl {
     pub async fn init(config: CustomConfig) -> Result<Self> {
         let pool = sqlx::PgPool::connect(&config.db_url).await?;
         Ok(Self { config, pool })
@@ -93,7 +93,7 @@ where c.relname = $2
   and a.attnum > 0";
 
 const INDEX_SQL: &str = "SELECT indexdef FROM pg_indexes WHERE schemaname = $1 and tablename = $2";
-impl GenStruct for PostgresStruct {
+impl GenStruct for PostgresImpl {
     async fn get_tables(&self) -> Result<Vec<Table2Comment>> {
         let mut pool = self.pool.acquire().await?;
         let mut tables = sqlx::query_as::<_, Table2Comment>(TABLES_SQL)

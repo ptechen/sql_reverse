@@ -3,7 +3,6 @@ use std::sync::{LazyLock, RwLock};
 pub static MYSQL_TEMPLATE: LazyLock<RwLock<&str>> = LazyLock::new(|| {
     RwLock::new(
         r#"
-/*
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use error::AppResult as Result;
@@ -50,11 +49,8 @@ pub struct {{ table.struct_name }} {
     {%- endif -%}
 {%- endfor %}
 }
-*/
 
-/*
 impl {{table.struct_name}} {
-    /*
     pub async fn insert(&self) -> Result<u64> {
     	let sql = format!("INSERT INTO {{table.table_name}} ({}) VALUES({% for field in table.fields -%}?{% if loop.last == false %},{% endif %}{%- endfor %})", FIELDS);
     	let mut pool = MYSQL_POOL.acquire().await?;
@@ -71,19 +67,16 @@ impl {{table.struct_name}} {
             .last_insert_id();
         Ok(data)
     }
-    */
 
-    /*
     pub async fn select_all() -> Result<Vec<Self>> {
         let sql = format!("SELECT {} from {} {% for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} WHERE is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
         let mut pool = MYSQL_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql).fetch_all(&mut *pool).await?;
         Ok(data)
     }
-    */
 
 {% for indexes in table.unique_key %}
-    /*
+    
     pub async fn select_optional_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Option<Self>>{
@@ -97,11 +90,11 @@ impl {{table.struct_name}} {
             .await?;
         Ok(data)
     }
-    */
+    
 {% endfor -%}
 
 {% for indexes in table.unique_key %}
-    /*
+    
     pub async fn select_one_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Self>{
@@ -115,11 +108,11 @@ impl {{table.struct_name}} {
             .await?;
         Ok(data)
     }
-    */
+    
 {% endfor -%}
 
 {% for indexes in table.index_key %}
-   /*
+   
     pub async fn select_many_by{%- for index in indexes -%}
                         _{{index}}
     {%- endfor -%}_by_page({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%}page_no: u64, page_size: u64)->Result<Vec<Self>>{
@@ -133,11 +126,10 @@ impl {{table.struct_name}} {
             .await?;
         Ok(data)
     }
-    */
 {% endfor -%}
 
 {% for indexes in table.index_key %}
-   /*
+   
     pub async fn select_all_by{%- for index in indexes -%}
                         _{{index}}
     {%- endfor -%}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Vec<Self>>{
@@ -151,13 +143,12 @@ impl {{table.struct_name}} {
             .await?;
         Ok(data)
     }
-    */
 {% endfor -%}
 
 {%- for v in table.fields -%}
     {%- if v.field_name == 'is_deleted' -%}
 {% for indexes in table.unique_key %}
-    /*
+    
     pub async fn delete_one_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<u64>{
@@ -171,11 +162,10 @@ impl {{table.struct_name}} {
             .await?.rows_affected();
         Ok(data)
     }
-    */
 {% endfor -%}
 
 {% for indexes in table.index_key %}
-   /*
+   
     pub async fn delete_many_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<u64>{
@@ -189,12 +179,10 @@ impl {{table.struct_name}} {
             .await?.rows_affected();
         Ok(data)
     }
-    */
 {% endfor -%}
     {%- endif -%}
 {%- endfor -%}
 }
-*/
     "#,
     )
 });
