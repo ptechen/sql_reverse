@@ -30,7 +30,7 @@ pub static FIELD_TYPE: LazyLock<RwLock<BTreeMap<String, String>>> = LazyLock::ne
         "^integer$".to_string() => "i32".to_string(),
         "^integer\\(\\d+\\) unsigned$".to_string() => "u32".to_string(),
         "^integer\\(\\d+\\)$".to_string() => "i32".to_string(),
-        "^json$".to_string() => "serde_json:: =>Value".to_string(),
+        "^json$".to_string() => "serde_json::Value".to_string(),
         "^mediumint unsigned$".to_string() => "u32".to_string(),
         "^mediumint$".to_string() => "i32".to_string(),
         "^mediumint\\(\\d+\\) unsigned$".to_string() => "u32".to_string(),
