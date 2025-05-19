@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::reverse_struct::{mysql_impl, postgres_impl, sqlite_impl};
+use crate::reverse_impl::{mysql_impl, postgres_impl, sqlite_impl};
 use tokio::io::AsyncWriteExt;
 
 pub async fn export() -> Result<()> {

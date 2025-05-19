@@ -1,4 +1,5 @@
-use crate::reverse_struct::mysql_impl;
+use crate::keywords::LANGUAGE;
+use crate::reverse_impl::mysql_impl;
 use crate::table::{Field, Table2Comment};
 use crate::template::kit::Kit;
 use inflector::Inflector;
@@ -22,9 +23,9 @@ impl FromRow<'_, MySqlRow> for Field {
         .unwrap_or_default();
         let default = row.try_get("default_value").ok();
         Ok(Field {
-            field_name,
+            field_name: LANGUAGE.check_field_name(&field_name),
             FieldName: first_char_uppercase_field_name,
-            fieldName: field_name_camel_case,
+            fieldName: LANGUAGE.check_field_name(&field_name_camel_case),
             database_field_type,
             field_type,
             comment,

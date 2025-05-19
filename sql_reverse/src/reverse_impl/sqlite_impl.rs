@@ -1,6 +1,6 @@
 use crate::error::Result;
-use crate::reverse_struct::common::CustomConfig;
-use crate::reverse_struct::gen_struct::GenStruct;
+use crate::reverse_impl::common::CustomConfig;
+use crate::reverse_impl::gen_struct::GenStruct;
 use crate::table::sqlite::Fields;
 use crate::table::{Table, Table2Comment};
 use crate::template::kit::Kit;

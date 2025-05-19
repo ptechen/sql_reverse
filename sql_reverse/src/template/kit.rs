@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::reverse_struct::common::CustomConfig;
+use crate::reverse_impl::common::CustomConfig;
 use regex::Regex;
 use std::collections::BTreeMap;
 use std::io::{self, Write};

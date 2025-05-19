@@ -1,4 +1,5 @@
-use crate::reverse_struct::sqlite_impl;
+use crate::keywords::LANGUAGE;
+use crate::reverse_impl::sqlite_impl;
 use crate::table::{Field, Table2Comment};
 use crate::template::kit::Kit;
 use fn_macro::if_else;
@@ -55,9 +56,9 @@ impl Fields {
                     keys.push(field_name.to_string())
                 }
                 fields.push(Field {
-                    field_name: field_name.to_string(),
+                    field_name: LANGUAGE.check_field_name(&field_name),
                     FieldName: first_char_uppercase_field_name.to_string(),
-                    fieldName: field_name_camel_case.to_string(),
+                    fieldName: LANGUAGE.check_field_name(&field_name_camel_case),
                     database_field_type: database_field_type.to_string(),
                     field_type,
                     comment: "".to_string(),

@@ -16,10 +16,10 @@ use crate::table::Table;
 use crate::template::mysql::MYSQL_TEMPLATE;
 use crate::template::postgres::POSTGRES_TEMPLATE;
 use crate::template::sqlite::SQLITE_TEMPLATE;
+use crate::template::template_type::{TEMPLATE_TYPE, TemplateType};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tera::{Context, Tera};
-use crate::template::template_type::{TemplateType, TEMPLATE_TYPE};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FilterFields {
@@ -27,8 +27,6 @@ pub struct FilterFields {
     pub contain_fields: Option<Vec<String>>,
     pub filename: String,
 }
-
-
 
 async fn filter_fields(table: &Table, params: Vec<FilterFields>) -> Result<Vec<(Table, String)>> {
     let mut list = vec![];
@@ -49,10 +47,7 @@ async fn filter_fields(table: &Table, params: Vec<FilterFields>) -> Result<Vec<(
 }
 
 pub trait Render {
-    async fn check_download_tera(
-        template_path: &str,
-        template_name: &str,
-    ) -> Result<()> {
+    async fn check_download_tera(template_path: &str, template_name: &str) -> Result<()> {
         let file = format!("{}{}", template_path.replace("*", ""), template_name);
         let _ = tokio::fs::create_dir(template_path.replace("*", "")).await;
         if !tokio::fs::try_exists(&file).await.unwrap_or_default() {
@@ -170,8 +165,14 @@ pub trait Render {
     }
 
     async fn append_to_file(mods: Vec<String>, filepath: &str) -> Result<()> {
-        if let Ok(mut fs) = tokio::fs::File::options().create_new(true).write(true).open(filepath).await{
-            fs.write_all(TEMPLATE_TYPE.read().unwrap().to_string().as_bytes()).await?;
+        if let Ok(mut fs) = tokio::fs::File::options()
+            .create_new(true)
+            .write(true)
+            .open(filepath)
+            .await
+        {
+            fs.write_all(TEMPLATE_TYPE.read().unwrap().to_string().as_bytes())
+                .await?;
         }
         let file_content = tokio::fs::read_to_string(filepath)
             .await
