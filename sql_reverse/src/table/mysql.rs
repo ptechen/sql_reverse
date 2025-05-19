@@ -20,7 +20,6 @@ impl FromRow<'_, MySqlRow> for Field {
             &mysql_impl::FIELD_TYPE.read().unwrap(),
         )
         .unwrap_or_default();
-        println!("field_name: {} field_type: {} database_field_type: {}", field_name, field_type, database_field_type);
         let default = row.try_get("default_value").ok();
         Ok(Field {
             field_name,
