@@ -5,7 +5,7 @@ pub static SQLITE_TEMPLATE: LazyLock<RwLock<&str>> = LazyLock::new(|| {
         r#"
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use error::Result;
+use super::Result;
 use super::SQLITE_POOL;
 
 pub const TABLE_NAME: &str = "{{table.table_name}}";
