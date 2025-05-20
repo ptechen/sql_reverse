@@ -72,7 +72,7 @@ impl {{table.struct_name}} {
 
     
     pub async fn select_all() -> Result<Vec<Self>> {
-        let sql = format!("SELECT {} from {} {% for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} WHERE is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
+        let sql = format!("SELECT {} FROM {} {% for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} WHERE is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
         let mut pool = POSTGRES_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql).fetch_all(&mut *pool).await?;
         Ok(data)
@@ -84,7 +84,7 @@ impl {{table.struct_name}} {
     pub async fn select_optional_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Option<Self>>{
-        let sql = format!("SELECT {} from {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ${{loop.index}} {% else %} {{index}} = ${{loop.index}} AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
+        let sql = format!("SELECT {} FROM {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ${{loop.index}} {% else %} {{index}} = ${{loop.index}} AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
         let mut pool = POSTGRES_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)
             {% for index in indexes -%}
@@ -102,7 +102,7 @@ impl {{table.struct_name}} {
     pub async fn select_one_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Self>{
-        let sql = format!("SELECT {} from {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ${{loop.index}} {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
+        let sql = format!("SELECT {} FROM {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ${{loop.index}} {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
         let mut pool = POSTGRES_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)
             {% for index in indexes -%}
@@ -120,7 +120,7 @@ impl {{table.struct_name}} {
     pub async fn select_many_by{%- for index in indexes -%}
                         _{{index}}
     {%- endfor -%}_by_page({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%}page_no: u64, page_size: u64)->Result<Vec<Self>>{
-        let sql = format!("SELECT {} from {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ${{loop.index}} AND {%- endif -%}{%- endfor -%} {%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor %} limit {},{}", FIELDS, TABLE_NAME, (page_no - 1) * page_size, page_no * page_size);
+        let sql = format!("SELECT {} FROM {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ${{loop.index}} AND {%- endif -%}{%- endfor -%} {%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor %} limit {},{}", FIELDS, TABLE_NAME, (page_no - 1) * page_size, page_no * page_size);
         let mut pool = POSTGRES_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)
             {% for index in indexes -%}
@@ -138,7 +138,7 @@ impl {{table.struct_name}} {
     pub async fn select_all_by{%- for index in indexes -%}
                         _{{index}}
     {%- endfor -%}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Vec<Self>>{
-        let sql = format!("SELECT {} from {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ${{loop.index}} {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%} {%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
+        let sql = format!("SELECT {} FROM {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ${{loop.index}} {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%} {%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
         let mut pool = POSTGRES_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)
             {% for index in indexes -%}
