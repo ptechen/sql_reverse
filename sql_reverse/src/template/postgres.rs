@@ -28,11 +28,7 @@ pub struct {{ table.struct_name }} {
 	    /// {{ v.comment }} {% if v.database_field_type %} field_type: {{ v.database_field_type }}{% endif %}{% if v.default %} default: {{ v.default }}{% endif %} {% if v.default == '' %} default: ''{% endif %}
 	{% endif -%}
 	{% if v.is_null == 1 -%}
-	    {%- if v.field_name == 'type' -%}
-	        pub r#{{ v.field_name }}: Option<{{ v.field_type }}>,
-	    {%- else -%}
-    	    pub {{ v.field_name }}: Option<{{ v.field_type }}>,
-    	{%- endif -%}
+    	pub {{ v.field_name }}: Option<{{ v.field_type }}>,
     {%- else -%}
         {% if v.field_type == 'time::OffsetDateTime' -%}
             #[serde(with = "time::serde::rfc3339::option", default)]
@@ -40,11 +36,7 @@ pub struct {{ table.struct_name }} {
         {% elif v.field_type == 'chrono::NaiveDateTime' -%}
     pub {{ v.field_name }}: Option<{{ v.field_type }}>,
         {%- else -%}
-            {%- if v.field_name == 'type' -%}
-            	pub r#{{ v.field_name }}: {{ v.field_type }},
-            {%- else -%}
-                pub {{ v.field_name }}: {{ v.field_type }},
-            {%- endif -%}
+            pub {{ v.field_name }}: {{ v.field_type }},
         {%- endif -%}
     {%- endif -%}
 {%- endfor %}
@@ -57,11 +49,7 @@ impl {{table.struct_name}} {
     	let mut pool = POSTGRES_POOL.acquire().await?;
     	let data = sqlx::query(&sql)
     	{%- for field in table.fields %}
-    	        {% if field.field_name == 'type' -%}
-                    .bind(&self.r#{{field.field_name}})
-                {%- else -%}
-                    .bind(&self.{{field.field_name}})
-                {%- endif %}
+             .bind(&self.{{field.field_name}})
         {%- endfor %}
     	    .execute(&mut *pool)
             .await?
