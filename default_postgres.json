@@ -27,5 +27,6 @@
     "^uuid$": "String",
     "^varchar$": "String",
     "^varchar\\(\\d+\\)$": "String",
-    "^xml$": "String"
+    "^xml$": "String",
+    "^boolean$": "bool"
 }

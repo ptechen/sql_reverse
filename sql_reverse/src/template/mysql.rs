@@ -44,7 +44,7 @@ pub struct {{ table.struct_name }} {
 
 impl {{table.struct_name}} {
     pub async fn insert(&self) -> Result<u64> {
-    	let sql = format!("INSERT INTO {{table.table_name}} ({}) VALUES({% for field in table.fields -%}?{% if loop.last == false %},{% endif %}{%- endfor %})", FIELDS);
+    	let sql = format!("INSERT INTO {{table.table_name}} ({FIELDS}) VALUES({% for field in table.fields -%}?{% if loop.last == false %},{% endif %}{%- endfor %})");
     	let mut pool = MYSQL_POOL.acquire().await?;
     	let data = sqlx::query(&sql)
     	{%- for field in table.fields %}
@@ -57,7 +57,7 @@ impl {{table.struct_name}} {
     }
 
     pub async fn select_all() -> Result<Vec<Self>> {
-        let sql = format!("SELECT {} FROM {} {% for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} WHERE is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
+        let sql = format!("SELECT {FIELDS} FROM {TABLE_NAME} {% for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} WHERE is_deleted = 0 {%- endif -%}{%- endfor -%}");
         let mut pool = MYSQL_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql).fetch_all(&mut *pool).await?;
         Ok(data)
@@ -68,7 +68,7 @@ impl {{table.struct_name}} {
     pub async fn select_optional_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Option<Self>>{
-        let sql = format!("SELECT {} FROM {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
+        let sql = format!("SELECT {FIELDS} FROM {TABLE_NAME} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}");
         let mut pool = MYSQL_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)
             {% for index in indexes -%}
@@ -86,7 +86,7 @@ impl {{table.struct_name}} {
     pub async fn select_one_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Self>{
-        let sql = format!("SELECT {} FROM {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
+        let sql = format!("SELECT {FIELDS} FROM {TABLE_NAME} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}");
         let mut pool = MYSQL_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)
             {% for index in indexes -%}
@@ -104,7 +104,7 @@ impl {{table.struct_name}} {
     pub async fn select_many_by{%- for index in indexes -%}
                         _{{index}}
     {%- endfor -%}_by_page({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%}page_no: u64, page_size: u64)->Result<Vec<Self>>{
-        let sql = format!("SELECT {} FROM {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%} {%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor %} limit {},{}", FIELDS, TABLE_NAME, (page_no - 1) * page_size, page_no * page_size);
+        let sql = format!("SELECT {FIELDS} FROM {TABLE_NAME} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%} {%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor %} limit {},{}", (page_no - 1) * page_size, page_no * page_size);
         let mut pool = MYSQL_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)
             {% for index in indexes -%}
@@ -121,7 +121,7 @@ impl {{table.struct_name}} {
     pub async fn select_all_by{%- for index in indexes -%}
                         _{{index}}
     {%- endfor -%}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<Vec<Self>>{
-        let sql = format!("SELECT {} FROM {} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%} {%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", FIELDS, TABLE_NAME);
+        let sql = format!("SELECT {FIELDS} FROM {TABLE_NAME} WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%} {%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}");
         let mut pool = MYSQL_POOL.acquire().await?;
         let data = sqlx::query_as::<_, Self>(&sql)
             {% for index in indexes -%}
@@ -140,7 +140,7 @@ impl {{table.struct_name}} {
     pub async fn delete_one_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<u64>{
-        let sql = format!("UPDATE {} SET is_deleted = 1 WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", TABLE_NAME);
+        let sql = format!("UPDATE {TABLE_NAME} SET is_deleted = 1 WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}");
         let mut pool = MYSQL_POOL.acquire().await?;
         let data = sqlx::query(&sql)
             {% for index in indexes -%}
@@ -157,7 +157,7 @@ impl {{table.struct_name}} {
     pub async fn delete_many_by {%- for index in indexes -%}
                         _{{index}}
     {%- endfor %}({%- for index in indexes -%}{{index}}: {%- for v in table.fields -%}{%- if v.field_name == index -%}{%- if v.field_type == 'String' -%}&str{%- else -%}{{v.field_type}}{%- endif -%}{%- endif -%}{%- endfor -%},{%- endfor -%})->Result<u64>{
-        let sql = format!("UPDATE {} SET is_deleted = 1 WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}", TABLE_NAME);
+        let sql = format!("UPDATE {TABLE_NAME} SET is_deleted = 1 WHERE {% for index in indexes -%} {%- if loop.last %} {{index}} = ? {% else %} {{index}} = ? AND {%- endif -%}{%- endfor -%}{%- for v in table.fields -%}{%- if v.field_name == 'is_deleted' -%} AND is_deleted = 0 {%- endif -%}{%- endfor -%}");
         let mut pool = MYSQL_POOL.acquire().await?;
         let data = sqlx::query(&sql)
             {% for index in indexes -%}
