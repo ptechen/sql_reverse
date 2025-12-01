@@ -72,7 +72,7 @@ impl MysqlImpl {
 const FIELD_SQL:&str = "SELECT CAST(COLUMN_NAME as CHAR ) as field_name, CAST(COLUMN_TYPE as CHAR ) as field_type, case when CAST(IS_NULLABLE as CHAR) = 'NO' THEN 0 else 1 END as is_null,
        CAST(COLUMN_COMMENT as CHAR ) as comment, CAST(COLUMN_DEFAULT as CHAR ) as default_value
 FROM INFORMATION_SCHEMA.COLUMNS
-WHERE table_schema = DATABASE() AND table_name = ?";
+WHERE table_schema = DATABASE() AND table_name = ? ORDER BY ORDINAL_POSITION";
 const TABLES_SQL: &str = "SELECT CAST(TABLE_NAME AS CHAR) as table_name, CAST(TABLE_COMMENT as CHAR) as table_comment FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE()";
 
 impl GenStruct for MysqlImpl {
