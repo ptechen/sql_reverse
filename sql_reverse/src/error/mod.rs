@@ -20,4 +20,6 @@ pub enum Error {
     FromUtf8(#[from] std::string::FromUtf8Error),
     #[error(transparent)]
     ParseInt(#[from] std::num::ParseIntError),
+    #[error(transparent)]
+    Clickhouse(#[from] clickhouse::error::Error),
 }

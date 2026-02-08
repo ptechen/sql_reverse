@@ -1,6 +1,6 @@
 [package]
 name = "sql_reverse"
-version = "0.1.20"
+version = "0.1.21"
 edition = "2024"
 homepage = "https://github.com/ptechen"
 documentation = "https://docs.rs/sql_reverse"
@@ -25,3 +25,4 @@ tera = "1"
 thiserror = "2.0.12"
 clap = "4.5.38"
 fn_macro = "0.1.4"
+clickhouse = "0.13"

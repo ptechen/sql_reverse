@@ -13,6 +13,7 @@ example: [
 
 use crate::error::Result;
 use crate::table::Table;
+use crate::template::clickhouse::CLICKHOUSE_TEMPLATE;
 use crate::template::mysql::MYSQL_TEMPLATE;
 use crate::template::postgres::POSTGRES_TEMPLATE;
 use crate::template::sqlite::SQLITE_TEMPLATE;
@@ -68,6 +69,10 @@ pub trait Render {
                 }
                 TemplateType::Postgres => {
                     let data = POSTGRES_TEMPLATE.read().unwrap().as_bytes();
+                    fs.write_all(data).await?;
+                }
+                TemplateType::Clickhouse => {
+                    let data = CLICKHOUSE_TEMPLATE.read().unwrap().as_bytes();
                     fs.write_all(data).await?;
                 }
             }

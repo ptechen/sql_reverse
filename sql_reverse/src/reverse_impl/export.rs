@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::reverse_impl::{mysql_impl, postgres_impl, sqlite_impl};
+use crate::reverse_impl::{clickhouse_impl, mysql_impl, postgres_impl, sqlite_impl};
 use tokio::io::AsyncWriteExt;
 
 pub async fn export() -> Result<()> {
@@ -33,6 +33,17 @@ pub async fn export() -> Result<()> {
         .open("./default_sqlite.json")
         .await?;
     fs.write_all(sqlite_default.replace(",\n}", "\n}").as_bytes())
+        .await?;
+
+    let clickhouse_default = clickhouse_impl::FIELD_TYPE.read().unwrap().clone();
+    let clickhouse_default = format!("{:#?}", clickhouse_default);
+    let mut fs = tokio::fs::File::options()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .open("./default_clickhouse.json")
+        .await?;
+    fs.write_all(clickhouse_default.replace(",\n}", "\n}").as_bytes())
         .await?;
     Ok(())
 }

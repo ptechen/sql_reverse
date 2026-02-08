@@ -1,3 +1,4 @@
+mod clickhouse;
 pub mod kit;
 mod mysql;
 mod postgres;

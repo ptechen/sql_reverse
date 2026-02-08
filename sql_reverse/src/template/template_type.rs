@@ -12,6 +12,7 @@ pub enum TemplateType {
     Mysql,
     Sqlite,
     Postgres,
+    Clickhouse,
 }
 
 impl Display for TemplateType {
@@ -42,6 +43,15 @@ pub static SQLITE_POOL:std::sync::LazyLock<sqlx::sqlite::SqlitePool> = std::sync
     sqlx::sqlite::SqlitePool::connect_lazy("test.db?mode=rwc").expect("connect sqlite error")
 }});
 pub type Result<T> = std::result::Result<T, sqlx::Error>;
+"#
+            ),
+            TemplateType::Clickhouse => write!(
+                f,
+                r#"
+pub static CLICKHOUSE_CLIENT:std::sync::LazyLock<clickhouse::Client> = std::sync::LazyLock::new(|| {{
+    clickhouse::Client::default().with_url("http://127.0.0.1:8123").with_database("default")
+}});
+pub type Result<T> = std::result::Result<T, clickhouse::error::Error>;
 "#
             ),
         }

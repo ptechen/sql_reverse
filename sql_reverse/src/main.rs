@@ -10,6 +10,7 @@ use crate::error::Result;
 use crate::keywords::get_or_init;
 use crate::reverse_impl::export::export;
 use crate::reverse_impl::gen_struct::GenStruct;
+use crate::reverse_impl::clickhouse_impl::ClickhouseImpl;
 use crate::reverse_impl::mysql_impl::MysqlImpl;
 use crate::reverse_impl::postgres_impl::PostgresImpl;
 use crate::reverse_impl::sqlite_impl::SqliteImpl;
@@ -69,6 +70,22 @@ async fn main() -> Result<()> {
                 &opt.template_name,
                 &opt.suffix,
                 &sqlite.config.output_dir,
+                &tables,
+            )
+            .await?;
+        }
+        Command::Clickhouse(opt) => {
+            update_template_type(TemplateType::Clickhouse);
+            get_or_init(&opt.suffix).await;
+            let config = ClickhouseImpl::load(&opt.file).await?;
+            let clickhouse = ClickhouseImpl::init(config).await?;
+            let tables = clickhouse.run(&opt.custom_field_type).await?;
+            Table::check_download_tera(&opt.template_path, &opt.template_name).await?;
+            Table::render_rust(
+                &opt.template_path,
+                &opt.template_name,
+                &opt.suffix,
+                &clickhouse.config.output_dir,
                 &tables,
             )
             .await?;
