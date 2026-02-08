@@ -1,7 +1,7 @@
 # sql reverse
 
-# 基于数据库表结构自定义模版生成多种编程语言代码的命令行工具，支持 MySQL、Postgres、Sqlite。
-# A command-line tool that generates codes in multiple programming languages based on custom templates of database table structures, supporting MySQL、Postgres、Sqlite.
+# 基于数据库表结构自定义模版生成多种编程语言代码的命令行工具，支持 MySQL、Postgres、Sqlite、ClickHouse。
+# A command-line tool that generates codes in multiple programming languages based on custom templates of database table structures, supporting MySQL\Postgres\Sqlite\ClickHouse.
 [![Version info](https://img.shields.io/crates/v/sql_reverse.svg)](https://crates.io/crates/sql_reverse)
 [![Downloads](https://img.shields.io/crates/d/sql_reverse.svg?style=flat-square)](https://crates.io/crates/sql_reverse)
 [![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reverse)
@@ -11,7 +11,7 @@
     cargo install sql_reverse
 
 ## sql_reverse <SUBCOMMAND>
-    classify 0.1.18
+    classify 0.1.13
     
     USAGE:
         sql_reverse <SUBCOMMAND>
@@ -21,18 +21,19 @@
         -V, --version    Prints version information
     
     SUBCOMMANDS:
-        export      Export default database field types
-        help        Prints this message or the help of the given subcommand(s)
-        mysql       Mysql OPTIONS
-        postgres    Postgres OPTIONS
-        sqlite      Sqlite OPTIONS
+        export        Export default database field types
+        help          Prints this message or the help of the given subcommand(s)
+        mysql         Mysql OPTIONS
+        postgres      Postgres OPTIONS
+        sqlite        Sqlite OPTIONS
+        clickhouse    Clickhouse OPTIONS
 
 
 
 
-## sql_reverse mysql/postgres/sqlite [OPTIONS]
+## sql_reverse mysql/postgres/sqlite/clickhouse [OPTIONS]
     USAGE:
-    sql_reverse mysql/postgres/sqlite [OPTIONS]
+    sql_reverse mysql/postgres/sqlite/clickhouse [OPTIONS]
     
     FLAGS:
     -h, --help       Prints help information
@@ -52,14 +53,24 @@
     sql_reverse mysql -f reverse.yml
     sql_reverse postgres -f reverse.yml
     sql_reverse sqlite -f reverse.yml
+    sql_reverse clickhouse -f reverse.yml
 ## Custom Exec
     sql_reverse export
     sql_reverse mysql -f reverse.yml -p 'templates/*' -s rs -n mysql.tera -c ./mysql_default.json
     sql_reverse postgres -f reverse.yml -p 'templates/*' -s rs -n postgres.tera -c ./postgres_default.json
     sql_reverse sqlite -f reverse.yml -p 'templates/*' -s rs -n sqlite.tera -c ./sqlite_default.json
+    sql_reverse clickhouse -f reverse.yml -p 'templates/*' -s rs -n clickhouse.tera -c ./clickhouse_default.json
 ## reverse.yml
+    # MySQL
+    db_url: mysql://root:123456@localhost:3306/test
+    # Postgres
     db_url: postgres://postgres:123456@localhost/test
-    schemaname: public # only postgres enable
+    schemaname: public # only postgres/clickhouse enable
+    # Sqlite
+    db_url: data.db
+    # ClickHouse (HTTP protocol)
+    db_url: http://localhost:8123
+    schemaname: default # database name for clickhouse
     include_tables: # Include tables, can be ignored.
     #  - table_name
     exclude_tables: # Exclude, tables, can be ignored.
@@ -102,6 +113,48 @@
         pub is_null: u8,
         /// 默认值
         pub default: Option<String>
+    }
+
+## Rust sqlx template example:
+    use serde::{Deserialize, Serialize};
+    use sqlx::mysql::MySqlRow;
+    use sqlx::{FromRow, Row};
+    
+    {% if table.comment -%}
+    	/// {{ table.comment }}
+    {% endif -%}
+    {% for index in table.index_key -%}
+        /// 索引：{{index}}
+    {% endfor -%}
+    
+    
+    #[derive(Serialize, Deserialize, PartialEq, Clone)]
+    pub struct {{ table.struct_name }} {
+    {%- for v in table.fields %}
+    	{% if v.comment -%}
+    	    /// {{ v.comment }} {% if v.database_field_type %} field_type: {{ v.database_field_type }}{% endif %}{% if v.default %} default: {{ v.default }}{% endif %} {% if v.default == '' %} default: ''{% endif %}
+    	{% endif -%}
+    	{% if v.is_null == 1 -%}
+        	pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+        {%- else -%}
+            {% if v.field_type == 'NaiveDateTime' -%}
+                pub {{ v.field_name }}: Option<{{ v.field_type }}>,
+            {%- else -%}
+                pub {{ v.field_name }}: {{ v.field_type }},
+            {%- endif -%}
+        {%- endif -%}
+    {%- endfor %}
+    }
+    
+    
+    impl<'c> FromRow<'c, MySqlRow<'c>> for {{ table.struct_name }} {
+        fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
+            Ok({{ table.struct_name }} {
+    {%- for v in table.fields %}
+                {{ v.field_name }}: row.get( {{ loop.index0 }} ),
+    {%- endfor %}        
+            })
+        }
     }
 
 ## Rust template example:

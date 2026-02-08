@@ -21,12 +21,12 @@
         -V, --version    Prints version information
     
     SUBCOMMANDS:
-        clickhouse    Clickhouse OPTIONS
         export        Export default database field types
         help          Prints this message or the help of the given subcommand(s)
         mysql         Mysql OPTIONS
         postgres      Postgres OPTIONS
         sqlite        Sqlite OPTIONS
+        clickhouse    Clickhouse OPTIONS
 
 
 
