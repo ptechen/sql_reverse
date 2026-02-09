@@ -1,7 +1,7 @@
 # sql reverse
 
-# 基于数据库表结构自定义模版生成多种编程语言代码的命令行工具，支持 MySQL、Postgres、Sqlite、ClickHouse、TDengine。
-# A command-line tool that generates codes in multiple programming languages based on custom templates of database table structures, supporting MySQL\Postgres\Sqlite\ClickHouse\TDengine.
+# 基于数据库表结构自定义模版生成多种编程语言代码的命令行工具，支持 MySQL、Postgres、Sqlite、ClickHouse、TDEngine。
+# A command-line tool that generates codes in multiple programming languages based on custom templates of database table structures, supporting MySQL\Postgres\Sqlite\ClickHouse\TDEngine.
 [![Version info](https://img.shields.io/crates/v/sql_reverse.svg)](https://crates.io/crates/sql_reverse)
 [![Downloads](https://img.shields.io/crates/d/sql_reverse.svg?style=flat-square)](https://crates.io/crates/sql_reverse)
 [![docs](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/sql_reverse)
