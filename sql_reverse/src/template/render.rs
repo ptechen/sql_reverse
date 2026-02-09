@@ -17,6 +17,7 @@ use crate::template::clickhouse::CLICKHOUSE_TEMPLATE;
 use crate::template::mysql::MYSQL_TEMPLATE;
 use crate::template::postgres::POSTGRES_TEMPLATE;
 use crate::template::sqlite::SQLITE_TEMPLATE;
+use crate::template::tdengine::TDENGINE_TEMPLATE;
 use crate::template::template_type::{TEMPLATE_TYPE, TemplateType};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -73,6 +74,10 @@ pub trait Render {
                 }
                 TemplateType::Clickhouse => {
                     let data = CLICKHOUSE_TEMPLATE.read().unwrap().as_bytes();
+                    fs.write_all(data).await?;
+                }
+                TemplateType::Tdengine => {
+                    let data = TDENGINE_TEMPLATE.read().unwrap().as_bytes();
                     fs.write_all(data).await?;
                 }
             }

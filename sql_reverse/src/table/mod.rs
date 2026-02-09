@@ -2,6 +2,7 @@ pub mod clickhouse;
 pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
+pub mod tdengine;
 
 use crate::template::kit::Kit;
 use crate::template::render::Render;

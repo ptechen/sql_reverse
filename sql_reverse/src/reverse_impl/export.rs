@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::reverse_impl::{clickhouse_impl, mysql_impl, postgres_impl, sqlite_impl};
+use crate::reverse_impl::{clickhouse_impl, mysql_impl, postgres_impl, sqlite_impl, tdengine_impl};
 use tokio::io::AsyncWriteExt;
 
 pub async fn export() -> Result<()> {
@@ -44,6 +44,17 @@ pub async fn export() -> Result<()> {
         .open("./default_clickhouse.json")
         .await?;
     fs.write_all(clickhouse_default.replace(",\n}", "\n}").as_bytes())
+        .await?;
+
+    let tdengine_default = tdengine_impl::FIELD_TYPE.read().unwrap().clone();
+    let tdengine_default = format!("{:#?}", tdengine_default);
+    let mut fs = tokio::fs::File::options()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .open("./default_tdengine.json")
+        .await?;
+    fs.write_all(tdengine_default.replace(",\n}", "\n}").as_bytes())
         .await?;
     Ok(())
 }

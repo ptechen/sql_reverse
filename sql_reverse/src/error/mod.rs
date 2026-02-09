@@ -22,4 +22,6 @@ pub enum Error {
     ParseInt(#[from] std::num::ParseIntError),
     #[error(transparent)]
     Clickhouse(#[from] clickhouse::error::Error),
+    #[error(transparent)]
+    Taos(#[from] taos::Error),
 }

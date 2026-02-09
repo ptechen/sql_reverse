@@ -13,6 +13,7 @@ pub enum TemplateType {
     Sqlite,
     Postgres,
     Clickhouse,
+    Tdengine,
 }
 
 impl Display for TemplateType {
@@ -52,6 +53,15 @@ pub static CLICKHOUSE_CLIENT:std::sync::LazyLock<clickhouse::Client> = std::sync
     clickhouse::Client::default().with_url("http://127.0.0.1:8123").with_database("default")
 }});
 pub type Result<T> = std::result::Result<T, clickhouse::error::Error>;
+"#
+            ),
+            TemplateType::Tdengine => write!(
+                f,
+                r#"
+pub static TDENGINE_BUILDER:std::sync::LazyLock<taos::TaosBuilder> = std::sync::LazyLock::new(|| {{
+    taos::TaosBuilder::from_dsn("taos+ws://localhost:6041/test").expect("invalid TDengine DSN")
+}});
+pub type Result<T> = std::result::Result<T, taos::Error>;
 "#
             ),
         }

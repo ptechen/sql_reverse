@@ -5,3 +5,4 @@ pub mod gen_struct;
 pub mod mysql_impl;
 pub mod postgres_impl;
 pub mod sqlite_impl;
+pub mod tdengine_impl;
